@@ -558,15 +558,20 @@ async function createShortLink() {
       );
 
 
-    if (!insertResponse.ok) {
+    
+if (!insertResponse.ok) {
+  const errorDetails = await insertResponse.text();
 
-      showMessage(
-        "No se pudo guardar el enlace.",
-        "error"
-      );
+  console.error("Error de Supabase:", errorDetails);
 
-      return;
-    }
+  showMessage(
+    "Error al guardar: " + errorDetails,
+    "error"
+  );
+
+  return;
+}
+
 
 
     const shortUrl =
