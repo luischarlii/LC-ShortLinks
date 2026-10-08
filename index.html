@@ -74,6 +74,7 @@
       border-radius: 14px;
       font-size: 16px;
       outline: none;
+      margin-bottom: 18px;
     }
 
     input:focus {
@@ -82,7 +83,7 @@
 
     button {
       width: 100%;
-      margin-top: 14px;
+      margin-top: 0;
       padding: 16px;
       border: 0;
       border-radius: 14px;
@@ -90,6 +91,7 @@
       color: white;
       font-size: 17px;
       font-weight: 700;
+      cursor: pointer;
     }
 
     .result {
@@ -110,6 +112,7 @@
       background: white;
       color: #111;
       border: 1px solid #ddd;
+      margin-top: 10px;
     }
 
     .status {
@@ -117,6 +120,13 @@
       margin-top: 15px;
       color: #777;
       min-height: 20px;
+    }
+
+    .hint {
+      color: #888;
+      font-size: 13px;
+      margin-top: -10px;
+      margin-bottom: 18px;
     }
   </style>
 </head>
@@ -130,7 +140,7 @@
   <h1>LC ShortLinks</h1>
 
   <p class="subtitle">
-    Acorta y comparte tus enlaces
+    Crea enlaces cortos personalizados
   </p>
 
   <label for="url">Enlace original</label>
@@ -138,12 +148,26 @@
   <input
     id="url"
     type="url"
-    placeholder="https://ejemplo.com"
+    placeholder="https://youtube.com/..."
     autocomplete="off"
   >
 
+  <label for="code">Nombre de tu enlace</label>
+
+  <input
+    id="code"
+    type="text"
+    placeholder="tunombre"
+    autocomplete="off"
+    maxlength="30"
+  >
+
+  <div class="hint">
+    Solo letras, números, guiones y guion bajo.
+  </div>
+
   <button onclick="acortar()">
-    Acortar enlace
+    Crear enlace LC
   </button>
 
   <div id="result" class="result">
@@ -174,31 +198,75 @@ const SUPABASE_URL =
 const SUPABASE_KEY =
 "sb_publishable_4DOmAEAQ5tQv8U5zGgMHLg_m8u6N06J";
 
+
 async function acortar() {
 
-  const input = document.getElementById("url");
+  const urlInput = document.getElementById("url");
+  const codeInput = document.getElementById("code");
   const status = document.getElementById("status");
   const result = document.getElementById("result");
 
-  const originalUrl = input.value.trim();
+  const originalUrl = urlInput.value.trim();
+
+  let code = codeInput.value.trim().toLowerCase();
 
   if (!originalUrl) {
     status.textContent = "Pega primero un enlace.";
     return;
   }
 
-  try {
-    new URL(originalUrl);
-  } catch {
-    status.textContent = "El enlace no parece válido.";
+  if (!code) {
+    status.textContent = "Escribe el nombre de tu enlace.";
     return;
   }
 
-  status.textContent = "Creando enlace corto...";
+  try {
+    new URL(originalUrl);
+  } catch {
+    status.textContent = "El enlace original no parece válido.";
+    return;
+  }
 
-  const code = generarCodigo();
+  if (!/^[a-z0-9_-]+$/.test(code)) {
+    status.textContent =
+      "Usa solamente letras, números, guiones y guion bajo.";
+    return;
+  }
+
+  status.textContent = "Creando enlace LC...";
+  result.style.display = "none";
 
   try {
+
+    /* Comprobar si el nombre ya existe */
+
+    const checkResponse = await fetch(
+      `${SUPABASE_URL}/rest/v1/Links?code=eq.${encodeURIComponent(code)}&select=code`,
+      {
+        method: "GET",
+        headers: {
+          "apikey": SUPABASE_KEY,
+          "Authorization": `Bearer ${SUPABASE_KEY}`
+        }
+      }
+    );
+
+    if (!checkResponse.ok) {
+      status.textContent =
+        "No se pudo comprobar el nombre.";
+      return;
+    }
+
+    const existentes = await checkResponse.json();
+
+    if (existentes.length > 0) {
+      status.textContent =
+        "Ese nombre ya está ocupado. Elige otro.";
+      return;
+    }
+
+
+    /* Guardar el enlace */
 
     const response = await fetch(
       `${SUPABASE_URL}/rest/v1/Links`,
@@ -231,8 +299,11 @@ async function acortar() {
       return;
     }
 
+
+    /* Dirección corta */
+
     const shortUrl =
-      `${window.location.origin}${window.location.pathname}?l=${code}`;
+      `${window.location.origin}${window.location.pathname}${code}`;
 
     document.getElementById("shortUrl").textContent =
       shortUrl;
@@ -240,7 +311,7 @@ async function acortar() {
     result.style.display = "block";
 
     status.textContent =
-      "¡Enlace creado correctamente!";
+      "¡Enlace LC creado correctamente!";
 
   } catch (error) {
 
@@ -250,25 +321,6 @@ async function acortar() {
       "Error de conexión con Supabase.";
 
   }
-}
-
-
-function generarCodigo() {
-
-  const caracteres =
-    "ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz23456789";
-
-  let codigo = "";
-
-  for (let i = 0; i < 6; i++) {
-
-    codigo += caracteres.charAt(
-      Math.floor(Math.random() * caracteres.length)
-    );
-
-  }
-
-  return codigo;
 }
 
 
@@ -292,10 +344,18 @@ async function compartir() {
 
   if (navigator.share) {
 
-    await navigator.share({
-      title: "LC ShortLinks",
-      url: url
-    });
+    try {
+
+      await navigator.share({
+        title: "LC ShortLinks",
+        url: url
+      });
+
+    } catch (error) {
+
+      console.log(error);
+
+    }
 
   } else {
 
