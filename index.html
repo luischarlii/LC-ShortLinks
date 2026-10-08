@@ -3,485 +3,859 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="theme-color" content="#111111">
-  <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+
   <title>LC ShortLinks</title>
+
   <style>
     * {
       box-sizing: border-box;
     }
+
     body {
       margin: 0;
-      min-height: 100vh;
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      padding: 20px 16px 40px;
+      font-family: Arial, sans-serif;
       background: #f5f5f7;
       color: #111;
-      padding: 20px;
     }
-    .app {
-      width: 100%;
-      max-width: 500px;
-      margin: 20px auto;
-      background: white;
-      border-radius: 28px;
-      padding: 30px 22px;
-      box-shadow: 0 10px 40px rgba(0,0,0,.10);
+
+    .container {
+      max-width: 600px;
+      margin: 0 auto;
     }
+
     .logo {
-      width: 80px;
-      height: 80px;
-      border-radius: 20px;
-      background: #111;
-      color: white;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 28px;
-      font-weight: 800;
-      margin: 0 auto 18px;
+      display: block;
+      width: 90px;
+      height: 90px;
+      object-fit: contain;
+      margin: 10px auto 15px;
     }
+
     h1 {
       text-align: center;
-      margin: 0;
+      margin: 0 0 8px;
       font-size: 30px;
     }
+
     .subtitle {
       text-align: center;
-      color: #777;
-      margin: 8px 0 28px;
+      color: #666;
+      margin: 0 0 30px;
+      font-size: 15px;
     }
-    label {
+
+    .card {
+      background: white;
+      border-radius: 18px;
+      padding: 22px;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+      margin-bottom: 25px;
+    }
+
+    .field {
       display: block;
-      font-weight: 600;
-      margin-bottom: 8px;
-    }
-    input {
       width: 100%;
-      padding: 16px;
-      border: 1px solid #ddd;
-      border-radius: 14px;
+      margin-bottom: 22px;
+    }
+
+    .field label {
+      display: block;
+      font-weight: bold;
+      font-size: 16px;
+      margin-bottom: 9px;
+    }
+
+    .field input {
+      display: block;
+      width: 100%;
+      min-height: 52px;
+      padding: 14px 15px;
+      border: 2px solid #d9d9de;
+      border-radius: 12px;
+      background: #fff;
+      color: #111;
       font-size: 16px;
       outline: none;
-      margin-bottom: 18px;
+      -webkit-appearance: none;
     }
-    input:focus {
+
+    .field input:focus {
       border-color: #111;
     }
-    button {
+
+    .hint {
+      display: block;
+      margin-top: 7px;
+      color: #777;
+      font-size: 13px;
+      line-height: 1.4;
+    }
+
+    .button {
+      display: block;
       width: 100%;
-      padding: 16px;
-      border: 0;
-      border-radius: 14px;
+      min-height: 54px;
+      border: none;
+      border-radius: 13px;
       background: #111;
       color: white;
       font-size: 17px;
-      font-weight: 700;
+      font-weight: bold;
       cursor: pointer;
+      margin-top: 5px;
     }
-    .hint {
-      color: #888;
-      font-size: 13px;
-      margin-top: -10px;
-      margin-bottom: 18px;
+
+    .button:active {
+      transform: scale(0.98);
     }
+
     .result {
       display: none;
-      margin-top: 24px;
-      padding: 18px;
-      background: #f5f5f7;
-      border-radius: 16px;
+      margin-top: 20px;
+      padding: 16px;
+      background: #f1f1f3;
+      border-radius: 12px;
+      word-break: break-word;
     }
-    .short-url {
+
+    .result-title {
+      font-weight: bold;
+      margin-bottom: 8px;
+    }
+
+    .result-link {
+      color: #0066cc;
+      text-decoration: none;
       word-break: break-all;
-      font-weight: 600;
-      margin: 10px 0;
     }
-    .copy {
-      background: white;
-      color: #111;
-      border: 1px solid #ddd;
-      margin-top: 10px;
-    }
-    .status {
-      text-align: center;
-      margin-top: 15px;
-      color: #777;
-      min-height: 20px;
-    }
-    .links-section {
-      margin-top: 30px;
-      border-top: 1px solid #eee;
-      padding-top: 24px;
-    }
-    .links-title {
+
+    .result-buttons {
       display: flex;
-      justify-content: space-between;
-      align-items: center;
+      gap: 10px;
+      margin-top: 14px;
+    }
+
+    .small-button {
+      flex: 1;
+      min-height: 44px;
+      border: none;
+      border-radius: 10px;
+      background: #ddd;
+      color: #111;
+      font-weight: bold;
+      font-size: 14px;
+    }
+
+    .section-title {
+      margin: 0 0 15px;
+      font-size: 22px;
+    }
+
+    .counter {
+      color: #777;
+      font-size: 14px;
       margin-bottom: 15px;
     }
-    .links-title h2 {
-      margin: 0;
-      font-size: 21px;
-    }
-    .counter {
-      background: #111;
-      color: white;
-      padding: 5px 10px;
-      border-radius: 20px;
-      font-size: 13px;
-      font-weight: 700;
-    }
-    .link-card {
-      background: #f5f5f7;
-      border-radius: 16px;
+
+    .link-item {
+      background: #f7f7f8;
+      border-radius: 13px;
       padding: 15px;
       margin-bottom: 12px;
     }
-    .link-name {
+
+    .link-code {
+      font-weight: bold;
       font-size: 17px;
-      font-weight: 700;
       margin-bottom: 6px;
     }
-    .original {
-      color: #777;
-      font-size: 13px;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      margin-bottom: 12px;
-    }
-    .link-url {
+
+    .link-original {
+      color: #666;
       font-size: 13px;
       word-break: break-all;
       margin-bottom: 12px;
-      color: #555;
     }
-    .actions {
+
+    .link-url {
+      color: #0066cc;
+      font-size: 14px;
+      word-break: break-all;
+      margin-bottom: 12px;
+    }
+
+    .link-buttons {
       display: flex;
       gap: 8px;
     }
-    .actions button {
-      padding: 11px 8px;
-      font-size: 14px;
+
+    .link-buttons button {
       flex: 1;
+      min-height: 40px;
+      border: none;
+      border-radius: 9px;
+      background: #ddd;
+      font-weight: bold;
+      font-size: 13px;
     }
-    .open-button {
-      background: #111;
-      color: white;
-    }
-    .copy-button {
-      background: white;
-      color: #111;
-      border: 1px solid #ddd;
-    }
+
     .empty {
       text-align: center;
-      color: #888;
+      color: #777;
+      padding: 20px 5px;
+    }
+
+    .message {
+      margin-top: 15px;
+      padding: 12px;
+      border-radius: 10px;
+      display: none;
       font-size: 14px;
-      padding: 15px 5px;
+      line-height: 1.4;
+    }
+
+    .error {
+      background: #ffe5e5;
+      color: #a00000;
+    }
+
+    .success {
+      background: #e5f8e9;
+      color: #176b2c;
+    }
+
+    @media (max-width: 480px) {
+      body {
+        padding: 15px 12px 35px;
+      }
+
+      .card {
+        padding: 18px;
+      }
+
+      h1 {
+        font-size: 27px;
+      }
     }
   </style>
 </head>
+
 <body>
-<main class="app">
-  <div class="logo">LC</div>
-  <h1>LC ShortLinks</h1>
-  <p class="subtitle">
-    Crea enlaces cortos personalizados
-  </p>
 
-Enlace original
+  <div class="container">
 
-<input
-id=“url”
-type=“url”
-placeholder=“https://youtube.com/…”
-autocomplete=“off”
+    <img src="./logo.PNG" class="logo" alt="LC">
 
-Nombre de tu enlace
+    <h1>LC ShortLinks</h1>
 
-<input
-id=“code”
-type=“text”
-placeholder=“tunombre”
-autocomplete=“off”
-maxlength=“30”
+    <p class="subtitle">
+      Crea tus propios enlaces cortos
+    </p>
 
-  <div class="hint">
-    Solo letras, números, guiones y guion bajo.
-  </div>
-  <button onclick="acortar()">
-    Crear enlace LC
-  </button>
-  <div id="result" class="result">
-<strong>Tu enlace corto:</strong>
-<div id="shortUrl" class="short-url"></div>
-<button class="copy" onclick="copiarResultado()">
-  📋 Copiar enlace
-</button>
-<button class="copy" onclick="compartirResultado()">
-  📤 Compartir
-</button>
-  </div>
-  <div id="status" class="status"></div>
-  <section class="links-section">
-<div class="links-title">
-  <h2>Mis enlaces</h2>
-  <span id="counter" class="counter">
-    0
-  </span>
-</div>
-<div id="linksList">
-  <div class="empty">
-    Cargando enlaces...
-  </div>
-</div>
-  </section>
-</main>
-<script>
-const SUPABASE_URL =
-"https://tfwepffzhuyppsavmoqw.supabase.co";
-const SUPABASE_KEY =
-"sb_publishable_4DOmAEAQ5tQv8U5zGgMHLg_m8u6N06J";
-async function acortar() {
-  const urlInput =
-    document.getElementById("url");
-  const codeInput =
-    document.getElementById("code");
-  const status =
-    document.getElementById("status");
-  const result =
-    document.getElementById("result");
-  const originalUrl =
-    urlInput.value.trim();
-  let code =
-    codeInput.value.trim().toLowerCase();
-  if (!originalUrl) {
-    status.textContent =
-      "Pega primero un enlace.";
-    return;
-  }
-  if (!code) {
-    status.textContent =
-      "Escribe el nombre de tu enlace.";
-    return;
-  }
-  try {
-    new URL(originalUrl);
-  } catch {
-    status.textContent =
-      "El enlace original no parece válido.";
-    return;
-  }
-  if (!/^[a-z0-9_-]+$/.test(code)) {
-    status.textContent =
-      "Usa solamente letras, números, guiones y guion bajo.";
-    return;
-  }
-  status.textContent =
-    "Creando enlace LC...";
-  result.style.display =
-    "none";
-  try {
-    const checkResponse =
-      await fetch(
-        `${SUPABASE_URL}/rest/v1/Links?code=eq.${encodeURIComponent(code)}&select=code`,
-        {
-          method: "GET",
-          headers: {
-            "apikey": SUPABASE_KEY,
-            "Authorization": `Bearer ${SUPABASE_KEY}`
-          }
-        }
-      );
-    if (!checkResponse.ok) {
-      status.textContent =
-        "No se pudo comprobar el nombre.";
-      return;
-    }
-    const existentes =
-      await checkResponse.json();
-    if (existentes.length > 0) {
-      status.textContent =
-        "Ese nombre ya está ocupado. Elige otro.";
-      return;
-    }
-    const response =
-      await fetch(
-        `${SUPABASE_URL}/rest/v1/Links`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            "apikey": SUPABASE_KEY,
-            "Authorization": `Bearer ${SUPABASE_KEY}`,
-            "Prefer": "return=representation"
-          },
-          body: JSON.stringify({
-            code: code,
-            original_url: originalUrl
-          })
-        }
-      );
-    if (!response.ok) {
-      const error =
-        await response.text();
-      console.error(error);
-      status.textContent =
-        "No se pudo crear el enlace.";
-      return;
-    }
-    const shortUrl =
-      `${window.location.origin}${window.location.pathname}${code}`;
-    document.getElementById("shortUrl").textContent =
-      shortUrl;
-    result.style.display =
-      "block";
-    status.textContent =
-      "¡Enlace LC creado correctamente!";
-    cargarEnlaces();
-  } catch (error) {
-    console.error(error);
-    status.textContent =
-      "Error de conexión con Supabase.";
-  }
-}
-async function cargarEnlaces() {
-  const lista =
-    document.getElementById("linksList");
-  const counter =
-    document.getElementById("counter");
-  try {
-    const response =
-      await fetch(
-        `${SUPABASE_URL}/rest/v1/Links?select=code,original_url&order=code.asc`,
-        {
-          method: "GET",
-          headers: {
-            "apikey": SUPABASE_KEY,
-            "Authorization": `Bearer ${SUPABASE_KEY}`
-          }
-        }
-      );
-    if (!response.ok) {
-      lista.innerHTML =
-        `<div class="empty">
-          No se pudieron cargar los enlaces.
-        </div>`;
-      return;
-    }
-    const enlaces =
-      await response.json();
-    counter.textContent =
-      enlaces.length;
-    if (enlaces.length === 0) {
-      lista.innerHTML =
-        `<div class="empty">
-          Todavía no tienes enlaces creados.
-        </div>`;
-      return;
-    }
-    lista.innerHTML =
-      "";
-    enlaces.forEach(enlace => {
-      const shortUrl =
-        `${window.location.origin}${window.location.pathname}${enlace.code}`;
-      const card =
-        document.createElement("div");
-      card.className =
-        "link-card";
-      card.innerHTML = `
-        <div class="link-name">
-          /${escapeHtml(enlace.code)}
+    <!-- CREAR ENLACE -->
+    <div class="card">
+
+      <!-- ENLACE ORIGINAL -->
+      <div class="field">
+        <label for="originalUrl">
+          🔗 Enlace original
+        </label>
+
+        <input
+          type="url"
+          id="originalUrl"
+          placeholder="https://ejemplo.com/tu-enlace"
+          autocomplete="off"
+          autocapitalize="none"
+          spellcheck="false"
+        >
+
+        <span class="hint">
+          Pega aquí la dirección completa que quieres acortar.
+        </span>
+      </div>
+
+
+      <!-- NOMBRE DEL ENLACE -->
+      <div class="field">
+        <label for="customCode">
+          ✏️ Nombre de tu acortación
+        </label>
+
+        <input
+          type="text"
+          id="customCode"
+          placeholder="tunombre"
+          autocomplete="off"
+          autocapitalize="none"
+          spellcheck="false"
+        >
+
+        <span class="hint">
+          Por ejemplo: tunombre, video, tienda, promo2026, etc.
+        </span>
+      </div>
+
+
+      <!-- BOTÓN -->
+      <button
+        class="button"
+        id="createButton"
+        onclick="createShortLink()"
+      >
+        Crear enlace LC
+      </button>
+
+      <div id="message" class="message"></div>
+
+      <!-- RESULTADO -->
+      <div id="result" class="result">
+
+        <div class="result-title">
+          ✅ Tu enlace está listo:
         </div>
-        <div class="original">
-          ${escapeHtml(enlace.original_url)}
-        </div>
-        <div class="link-url">
-          ${escapeHtml(shortUrl)}
-        </div>
-        <div class="actions">
+
+        <a
+          id="resultLink"
+          class="result-link"
+          href="#"
+          target="_blank"
+        ></a>
+
+        <div class="result-buttons">
+
           <button
-            class="open-button"
-            onclick="abrirEnlace('${encodeURIComponent(shortUrl)}')">
-            🔗 Abrir
-          </button>
-          <button
-            class="copy-button"
-            onclick="copiarEnlace('${encodeURIComponent(shortUrl)}')">
+            class="small-button"
+            onclick="copyResult()"
+          >
             📋 Copiar
           </button>
+
+          <button
+            class="small-button"
+            onclick="shareResult()"
+          >
+            📤 Compartir
+          </button>
+
         </div>
-      `;
-      lista.appendChild(card);
-    });
-  } catch (error) {
-    console.error(error);
-    lista.innerHTML =
-      `<div class="empty">
-        Error de conexión.
-      </div>`;
+
+      </div>
+
+    </div>
+
+
+    <!-- MIS ENLACES -->
+    <div class="card">
+
+      <h2 class="section-title">
+        Mis enlaces
+      </h2>
+
+      <div
+        id="counter"
+        class="counter"
+      >
+        Cargando enlaces...
+      </div>
+
+      <div id="linksList"></div>
+
+    </div>
+
+  </div>
+
+
+<script>
+
+  // ==========================
+  // SUPABASE
+  // ==========================
+
+  const SUPABASE_URL =
+    "https://tfwepffzhuyppsavmoqw.supabase.co";
+
+  const SUPABASE_KEY =
+    "sb_publishable_4DOmAEAQ5tQv8U5zGgMHLg_m8u6N06J";
+
+
+  // ==========================
+  // ELEMENTOS
+  // ==========================
+
+  const originalUrl =
+    document.getElementById("originalUrl");
+
+  const customCode =
+    document.getElementById("customCode");
+
+  const result =
+    document.getElementById("result");
+
+  const resultLink =
+    document.getElementById("resultLink");
+
+  const message =
+    document.getElementById("message");
+
+  const linksList =
+    document.getElementById("linksList");
+
+  const counter =
+    document.getElementById("counter");
+
+
+  // ==========================
+  // MENSAJES
+  // ==========================
+
+  function showMessage(text, type) {
+
+    message.textContent = text;
+
+    message.className =
+      "message " + type;
+
+    message.style.display = "block";
   }
-}
-function abrirEnlace(url) {
-  const enlace =
-    decodeURIComponent(url);
-  window.open(
-    enlace,
-    "_blank"
-  );
-}
-async function copiarEnlace(url) {
-  const enlace =
-    decodeURIComponent(url);
-  try {
-    await navigator.clipboard.writeText(
-      enlace
-    );
-    document.getElementById("status").textContent =
-      "Enlace copiado.";
-  } catch {
-    document.getElementById("status").textContent =
-      "No se pudo copiar el enlace.";
+
+
+  function hideMessage() {
+
+    message.style.display = "none";
+
   }
-}
-async function copiarResultado() {
-  const url =
-    document.getElementById("shortUrl").textContent;
-  try {
-    await navigator.clipboard.writeText(url);
-    document.getElementById("status").textContent =
-      "Enlace copiado.";
-  } catch {
-    document.getElementById("status").textContent =
-      "No se pudo copiar el enlace.";
-  }
-}
-async function compartirResultado() {
-  const url =
-    document.getElementById("shortUrl").textContent;
-  if (navigator.share) {
-    try {
-      await navigator.share({
-        title: "LC ShortLinks",
-        url: url
-      });
-    } catch (error) {
-      console.log(error);
+
+
+  // ==========================
+  // CREAR ENLACE
+  // ==========================
+
+  async function createShortLink() {
+
+    hideMessage();
+
+    result.style.display = "none";
+
+
+    const url =
+      originalUrl.value.trim();
+
+    const code =
+      customCode.value.trim();
+
+
+    if (!url) {
+
+      showMessage(
+        "Escribe primero el enlace original.",
+        "error"
+      );
+
+      return;
     }
-  } else {
-    copiarResultado();
+
+
+    if (!code) {
+
+      showMessage(
+        "Escribe el nombre que tendrá tu acortación.",
+        "error"
+      );
+
+      return;
+    }
+
+
+    // Validar URL
+    try {
+
+      new URL(url);
+
+    } catch {
+
+      showMessage(
+        "El enlace original no parece válido.",
+        "error"
+      );
+
+      return;
+    }
+
+
+    // Validar nombre
+    if (!/^[a-zA-Z0-9_-]+$/.test(code)) {
+
+      showMessage(
+        "El nombre solo puede contener letras, números, guiones y guiones bajos.",
+        "error"
+      );
+
+      return;
+    }
+
+
+    try {
+
+      // Comprobar si ya existe
+      const checkResponse =
+        await fetch(
+          `${SUPABASE_URL}/rest/v1/Links?code=eq.${encodeURIComponent(code)}&select=code`,
+          {
+            headers: {
+              "apikey": SUPABASE_KEY,
+              "Authorization": `Bearer ${SUPABASE_KEY}`
+            }
+          }
+        );
+
+
+      const existing =
+        await checkResponse.json();
+
+
+      if (existing.length > 0) {
+
+        showMessage(
+          `El nombre "${code}" ya está ocupado. Elige otro.`,
+          "error"
+        );
+
+        return;
+      }
+
+
+      // Guardar en Supabase
+      const insertResponse =
+        await fetch(
+          `${SUPABASE_URL}/rest/v1/Links`,
+          {
+            method: "POST",
+
+            headers: {
+              "apikey": SUPABASE_KEY,
+              "Authorization": `Bearer ${SUPABASE_KEY}`,
+              "Content-Type": "application/json",
+              "Prefer": "return=representation"
+            },
+
+            body: JSON.stringify({
+              code: code,
+              original_url: url
+            })
+          }
+        );
+
+
+      if (!insertResponse.ok) {
+
+        const errorText =
+          await insertResponse.text();
+
+        console.error(errorText);
+
+        showMessage(
+          "No se pudo guardar el enlace.",
+          "error"
+        );
+
+        return;
+      }
+
+
+      // Crear URL corta
+      const shortUrl =
+        `${window.location.origin}${window.location.pathname}${code}`;
+
+
+      resultLink.href = shortUrl;
+
+      resultLink.textContent = shortUrl;
+
+      result.style.display = "block";
+
+
+      showMessage(
+        "¡Enlace creado correctamente!",
+        "success"
+      );
+
+
+      // Limpiar campos
+      originalUrl.value = "";
+      customCode.value = "";
+
+
+      // Recargar lista
+      loadLinks();
+
+    } catch (error) {
+
+      console.error(error);
+
+      showMessage(
+        "Ocurrió un error al crear el enlace.",
+        "error"
+      );
+
+    }
+
   }
-}
-function escapeHtml(text) {
-  const div =
-    document.createElement("div");
-  div.textContent =
-    text;
-  return div.innerHTML;
-}
-cargarEnlaces();
+
+
+  // ==========================
+  // COPIAR
+  // ==========================
+
+  async function copyResult() {
+
+    const url =
+      resultLink.textContent;
+
+    try {
+
+      await navigator.clipboard.writeText(url);
+
+      showMessage(
+        "Enlace copiado.",
+        "success"
+      );
+
+    } catch {
+
+      showMessage(
+        "No se pudo copiar automáticamente.",
+        "error"
+      );
+
+    }
+
+  }
+
+
+  // ==========================
+  // COMPARTIR
+  // ==========================
+
+  async function shareResult() {
+
+    const url =
+      resultLink.textContent;
+
+
+    if (navigator.share) {
+
+      try {
+
+        await navigator.share({
+          title: "LC ShortLinks",
+          text: "Mira este enlace:",
+          url: url
+        });
+
+      } catch (error) {
+
+        console.log(error);
+
+      }
+
+    } else {
+
+      await copyResult();
+
+    }
+
+  }
+
+
+  // ==========================
+  // CARGAR MIS ENLACES
+  // ==========================
+
+  async function loadLinks() {
+
+    try {
+
+      const response =
+        await fetch(
+          `${SUPABASE_URL}/rest/v1/Links?select=code,original_url&order=code.asc`,
+          {
+            headers: {
+              "apikey": SUPABASE_KEY,
+              "Authorization": `Bearer ${SUPABASE_KEY}`
+            }
+          }
+        );
+
+
+      if (!response.ok) {
+
+        throw new Error(
+          "No se pudieron cargar los enlaces."
+        );
+
+      }
+
+
+      const links =
+        await response.json();
+
+
+      counter.textContent =
+        `${links.length} enlace${links.length === 1 ? "" : "s"} creado${links.length === 1 ? "" : "s"}`;
+
+
+      if (links.length === 0) {
+
+        linksList.innerHTML =
+          `<div class="empty">
+            Todavía no tienes enlaces creados.
+          </div>`;
+
+        return;
+      }
+
+
+      linksList.innerHTML = "";
+
+
+      links.forEach(link => {
+
+        const shortUrl =
+          `${window.location.origin}${window.location.pathname}${link.code}`;
+
+
+        const item =
+          document.createElement("div");
+
+        item.className =
+          "link-item";
+
+
+        item.innerHTML = `
+
+          <div class="link-code">
+            🔗 ${escapeHtml(link.code)}
+          </div>
+
+          <div class="link-original">
+            ${escapeHtml(link.original_url)}
+          </div>
+
+          <div class="link-url">
+            ${escapeHtml(shortUrl)}
+          </div>
+
+          <div class="link-buttons">
+
+            <button
+              onclick="openLink('${encodeURIComponent(shortUrl)}')"
+            >
+              Abrir
+            </button>
+
+            <button
+              onclick="copyLink('${encodeURIComponent(shortUrl)}')"
+            >
+              Copiar
+            </button>
+
+          </div>
+
+        `;
+
+
+        linksList.appendChild(item);
+
+      });
+
+
+    } catch (error) {
+
+      console.error(error);
+
+      counter.textContent =
+        "No se pudieron cargar los enlaces.";
+
+      linksList.innerHTML =
+        `<div class="empty">
+          Ocurrió un error al cargar tus enlaces.
+        </div>`;
+
+    }
+
+  }
+
+
+  // ==========================
+  // ABRIR ENLACE
+  // ==========================
+
+  function openLink(encodedUrl) {
+
+    const url =
+      decodeURIComponent(encodedUrl);
+
+    window.open(url, "_blank");
+
+  }
+
+
+  // ==========================
+  // COPIAR ENLACE DE LA LISTA
+  // ==========================
+
+  async function copyLink(encodedUrl) {
+
+    const url =
+      decodeURIComponent(encodedUrl);
+
+
+    try {
+
+      await navigator.clipboard.writeText(url);
+
+      showMessage(
+        "Enlace copiado.",
+        "success"
+      );
+
+    } catch {
+
+      showMessage(
+        "No se pudo copiar el enlace.",
+        "error"
+      );
+
+    }
+
+  }
+
+
+  // ==========================
+  // SEGURIDAD HTML
+  // ==========================
+
+  function escapeHtml(text) {
+
+    return String(text)
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;")
+      .replace(/'/g, "&#039;");
+
+  }
+
+
+  // ==========================
+  // INICIAR
+  // ==========================
+
+  loadLinks();
+
 </script>
+
 </body>
 </html>
