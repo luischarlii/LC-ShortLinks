@@ -1,47 +1,272 @@
-<script>
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#111111">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <title>LC ShortLinks</title>
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: #f5f5f7;
+      color: #111;
+      padding: 20px;
+    }
+    .app {
+      width: 100%;
+      max-width: 500px;
+      margin: 20px auto;
+      background: white;
+      border-radius: 28px;
+      padding: 30px 22px;
+      box-shadow: 0 10px 40px rgba(0,0,0,.10);
+    }
+    .logo {
+      width: 80px;
+      height: 80px;
+      border-radius: 20px;
+      background: #111;
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 28px;
+      font-weight: 800;
+      margin: 0 auto 18px;
+    }
+    h1 {
+      text-align: center;
+      margin: 0;
+      font-size: 30px;
+    }
+    .subtitle {
+      text-align: center;
+      color: #777;
+      margin: 8px 0 28px;
+    }
+    label {
+      display: block;
+      font-weight: 600;
+      margin-bottom: 8px;
+    }
+    input {
+      width: 100%;
+      padding: 16px;
+      border: 1px solid #ddd;
+      border-radius: 14px;
+      font-size: 16px;
+      outline: none;
+      margin-bottom: 18px;
+    }
+    input:focus {
+      border-color: #111;
+    }
+    button {
+      width: 100%;
+      padding: 16px;
+      border: 0;
+      border-radius: 14px;
+      background: #111;
+      color: white;
+      font-size: 17px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+    .hint {
+      color: #888;
+      font-size: 13px;
+      margin-top: -10px;
+      margin-bottom: 18px;
+    }
+    .result {
+      display: none;
+      margin-top: 24px;
+      padding: 18px;
+      background: #f5f5f7;
+      border-radius: 16px;
+    }
+    .short-url {
+      word-break: break-all;
+      font-weight: 600;
+      margin: 10px 0;
+    }
+    .copy {
+      background: white;
+      color: #111;
+      border: 1px solid #ddd;
+      margin-top: 10px;
+    }
+    .status {
+      text-align: center;
+      margin-top: 15px;
+      color: #777;
+      min-height: 20px;
+    }
+    .links-section {
+      margin-top: 30px;
+      border-top: 1px solid #eee;
+      padding-top: 24px;
+    }
+    .links-title {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 15px;
+    }
+    .links-title h2 {
+      margin: 0;
+      font-size: 21px;
+    }
+    .counter {
+      background: #111;
+      color: white;
+      padding: 5px 10px;
+      border-radius: 20px;
+      font-size: 13px;
+      font-weight: 700;
+    }
+    .link-card {
+      background: #f5f5f7;
+      border-radius: 16px;
+      padding: 15px;
+      margin-bottom: 12px;
+    }
+    .link-name {
+      font-size: 17px;
+      font-weight: 700;
+      margin-bottom: 6px;
+    }
+    .original {
+      color: #777;
+      font-size: 13px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      margin-bottom: 12px;
+    }
+    .link-url {
+      font-size: 13px;
+      word-break: break-all;
+      margin-bottom: 12px;
+      color: #555;
+    }
+    .actions {
+      display: flex;
+      gap: 8px;
+    }
+    .actions button {
+      padding: 11px 8px;
+      font-size: 14px;
+      flex: 1;
+    }
+    .open-button {
+      background: #111;
+      color: white;
+    }
+    .copy-button {
+      background: white;
+      color: #111;
+      border: 1px solid #ddd;
+    }
+    .empty {
+      text-align: center;
+      color: #888;
+      font-size: 14px;
+      padding: 15px 5px;
+    }
+  </style>
+</head>
+<body>
+<main class="app">
+  <div class="logo">LC</div>
+  <h1>LC ShortLinks</h1>
+  <p class="subtitle">
+    Crea enlaces cortos personalizados
+  </p>
 
+Enlace original
+
+<input
+id=“url”
+type=“url”
+placeholder=“https://youtube.com/…”
+autocomplete=“off”
+
+Nombre de tu enlace
+
+<input
+id=“code”
+type=“text”
+placeholder=“tunombre”
+autocomplete=“off”
+maxlength=“30”
+
+  <div class="hint">
+    Solo letras, números, guiones y guion bajo.
+  </div>
+  <button onclick="acortar()">
+    Crear enlace LC
+  </button>
+  <div id="result" class="result">
+<strong>Tu enlace corto:</strong>
+<div id="shortUrl" class="short-url"></div>
+<button class="copy" onclick="copiarResultado()">
+  📋 Copiar enlace
+</button>
+<button class="copy" onclick="compartirResultado()">
+  📤 Compartir
+</button>
+  </div>
+  <div id="status" class="status"></div>
+  <section class="links-section">
+<div class="links-title">
+  <h2>Mis enlaces</h2>
+  <span id="counter" class="counter">
+    0
+  </span>
+</div>
+<div id="linksList">
+  <div class="empty">
+    Cargando enlaces...
+  </div>
+</div>
+  </section>
+</main>
+<script>
 const SUPABASE_URL =
 "https://tfwepffzhuyppsavmoqw.supabase.co";
-
 const SUPABASE_KEY =
 "sb_publishable_4DOmAEAQ5tQv8U5zGgMHLg_m8u6N06J";
-
-
 async function acortar() {
-
   const urlInput =
     document.getElementById("url");
-
   const codeInput =
     document.getElementById("code");
-
   const status =
     document.getElementById("status");
-
   const result =
     document.getElementById("result");
-
   const originalUrl =
     urlInput.value.trim();
-
   let code =
     codeInput.value.trim().toLowerCase();
-
-
   if (!originalUrl) {
     status.textContent =
       "Pega primero un enlace.";
     return;
   }
-
-
   if (!code) {
     status.textContent =
       "Escribe el nombre de tu enlace.";
     return;
   }
-
-
   try {
     new URL(originalUrl);
   } catch {
@@ -49,347 +274,214 @@ async function acortar() {
       "El enlace original no parece válido.";
     return;
   }
-
-
   if (!/^[a-z0-9_-]+$/.test(code)) {
     status.textContent =
       "Usa solamente letras, números, guiones y guion bajo.";
     return;
   }
-
-
   status.textContent =
     "Creando enlace LC...";
-
   result.style.display =
     "none";
-
-
   try {
-
     const checkResponse =
       await fetch(
         `${SUPABASE_URL}/rest/v1/Links?code=eq.${encodeURIComponent(code)}&select=code`,
         {
           method: "GET",
-
           headers: {
             "apikey": SUPABASE_KEY,
             "Authorization": `Bearer ${SUPABASE_KEY}`
           }
         }
       );
-
-
     if (!checkResponse.ok) {
       status.textContent =
         "No se pudo comprobar el nombre.";
       return;
     }
-
-
     const existentes =
       await checkResponse.json();
-
-
     if (existentes.length > 0) {
       status.textContent =
         "Ese nombre ya está ocupado. Elige otro.";
       return;
     }
-
-
     const response =
       await fetch(
         `${SUPABASE_URL}/rest/v1/Links`,
         {
           method: "POST",
-
           headers: {
             "Content-Type": "application/json",
             "apikey": SUPABASE_KEY,
             "Authorization": `Bearer ${SUPABASE_KEY}`,
             "Prefer": "return=representation"
           },
-
           body: JSON.stringify({
             code: code,
             original_url: originalUrl
           })
         }
       );
-
-
     if (!response.ok) {
-
       const error =
         await response.text();
-
       console.error(error);
-
       status.textContent =
         "No se pudo crear el enlace.";
-
       return;
     }
-
-
     const shortUrl =
       `${window.location.origin}${window.location.pathname}${code}`;
-
-
     document.getElementById("shortUrl").textContent =
       shortUrl;
-
-
     result.style.display =
       "block";
-
-
     status.textContent =
       "¡Enlace LC creado correctamente!";
-
-
     cargarEnlaces();
-
   } catch (error) {
-
     console.error(error);
-
     status.textContent =
       "Error de conexión con Supabase.";
-
   }
-
 }
-
-
 async function cargarEnlaces() {
-
   const lista =
     document.getElementById("linksList");
-
   const counter =
     document.getElementById("counter");
-
-
   try {
-
     const response =
       await fetch(
         `${SUPABASE_URL}/rest/v1/Links?select=code,original_url&order=code.asc`,
         {
           method: "GET",
-
           headers: {
             "apikey": SUPABASE_KEY,
             "Authorization": `Bearer ${SUPABASE_KEY}`
           }
         }
       );
-
-
     if (!response.ok) {
-
       lista.innerHTML =
         `<div class="empty">
           No se pudieron cargar los enlaces.
         </div>`;
-
       return;
     }
-
-
     const enlaces =
       await response.json();
-
-
     counter.textContent =
       enlaces.length;
-
-
     if (enlaces.length === 0) {
-
       lista.innerHTML =
         `<div class="empty">
           Todavía no tienes enlaces creados.
         </div>`;
-
       return;
     }
-
-
     lista.innerHTML =
       "";
-
-
     enlaces.forEach(enlace => {
-
       const shortUrl =
         `${window.location.origin}${window.location.pathname}${enlace.code}`;
-
-
       const card =
         document.createElement("div");
-
       card.className =
         "link-card";
-
-
       card.innerHTML = `
-
         <div class="link-name">
           /${escapeHtml(enlace.code)}
         </div>
-
         <div class="original">
           ${escapeHtml(enlace.original_url)}
         </div>
-
         <div class="link-url">
           ${escapeHtml(shortUrl)}
         </div>
-
         <div class="actions">
-
           <button
             class="open-button"
             onclick="abrirEnlace('${encodeURIComponent(shortUrl)}')">
             🔗 Abrir
           </button>
-
           <button
             class="copy-button"
             onclick="copiarEnlace('${encodeURIComponent(shortUrl)}')">
             📋 Copiar
           </button>
-
         </div>
-
       `;
-
-
       lista.appendChild(card);
-
     });
-
-
   } catch (error) {
-
     console.error(error);
-
     lista.innerHTML =
       `<div class="empty">
         Error de conexión.
       </div>`;
-
   }
-
 }
-
-
 function abrirEnlace(url) {
-
   const enlace =
     decodeURIComponent(url);
-
   window.open(
     enlace,
     "_blank"
   );
-
 }
-
-
 async function copiarEnlace(url) {
-
   const enlace =
     decodeURIComponent(url);
-
   try {
-
     await navigator.clipboard.writeText(
       enlace
     );
-
     document.getElementById("status").textContent =
       "Enlace copiado.";
-
   } catch {
-
     document.getElementById("status").textContent =
       "No se pudo copiar el enlace.";
-
   }
-
 }
-
-
 async function copiarResultado() {
-
   const url =
     document.getElementById("shortUrl").textContent;
-
   try {
-
     await navigator.clipboard.writeText(url);
-
     document.getElementById("status").textContent =
       "Enlace copiado.";
-
   } catch {
-
     document.getElementById("status").textContent =
       "No se pudo copiar el enlace.";
-
   }
-
 }
-
-
 async function compartirResultado() {
-
   const url =
     document.getElementById("shortUrl").textContent;
-
-
   if (navigator.share) {
-
     try {
-
       await navigator.share({
         title: "LC ShortLinks",
         url: url
       });
-
     } catch (error) {
-
       console.log(error);
-
     }
-
   } else {
-
     copiarResultado();
-
   }
-
 }
-
-
 function escapeHtml(text) {
-
   const div =
     document.createElement("div");
-
   div.textContent =
     text;
-
   return div.innerHTML;
-
 }
-
-
 cargarEnlaces();
-
 </script>
+</body>
+</html>
