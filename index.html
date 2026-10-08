@@ -175,13 +175,25 @@
       color: #666;
       font-size: 13px;
       word-break: break-all;
-      margin-bottom: 12px;
+      margin-bottom: 10px;
     }
 
     .link-url {
       color: #0066cc;
       font-size: 14px;
       word-break: break-all;
+      margin-bottom: 10px;
+    }
+
+    /* CONTADOR DE CLICS */
+    .clicks {
+      display: inline-block;
+      background: #e9e9ed;
+      color: #333;
+      border-radius: 8px;
+      padding: 6px 10px;
+      font-size: 13px;
+      font-weight: bold;
       margin-bottom: 12px;
     }
 
@@ -200,7 +212,6 @@
       font-size: 13px;
     }
 
-    /* BOTÓN BORRAR */
     .link-buttons .delete-button {
       background: #ffe1e1;
       color: #b00000;
@@ -253,711 +264,677 @@
 
 <body>
 
-  <div class="container">
+<div class="container">
 
-    <img src="./logo.PNG" class="logo" alt="LC">
+  <img src="./logo.PNG" class="logo" alt="LC">
 
-    <h1>LC ShortLinks</h1>
+  <h1>LC ShortLinks</h1>
 
-    <p class="subtitle">
-      Crea tus propios enlaces cortos
-    </p>
-
-
-    <!-- CREAR ENLACE -->
-    <div class="card">
-
-      <!-- ENLACE ORIGINAL -->
-      <div class="field">
-
-        <label for="originalUrl">
-          🔗 Enlace original
-        </label>
-
-        <input
-          type="url"
-          id="originalUrl"
-          placeholder="https://ejemplo.com/tu-enlace"
-          autocomplete="off"
-          autocapitalize="none"
-          spellcheck="false"
-        >
-
-        <span class="hint">
-          Pega aquí la dirección completa que quieres acortar.
-        </span>
-
-      </div>
+  <p class="subtitle">
+    Crea tus propios enlaces cortos
+  </p>
 
 
-      <!-- NOMBRE -->
-      <div class="field">
+  <!-- CREAR ENLACE -->
+  <div class="card">
 
-        <label for="customCode">
-          ✏️ Nombre de tu acortación
-        </label>
+    <div class="field">
 
-        <input
-          type="text"
-          id="customCode"
-          placeholder="tunombre"
-          autocomplete="off"
-          autocapitalize="none"
-          spellcheck="false"
-        >
+      <label for="originalUrl">
+        🔗 Enlace original
+      </label>
 
-        <span class="hint">
-          Por ejemplo: tunombre, video, tienda, promo2026, etc.
-        </span>
-
-      </div>
-
-
-      <!-- CREAR -->
-      <button
-        class="button"
-        id="createButton"
-        onclick="createShortLink()"
+      <input
+        type="url"
+        id="originalUrl"
+        placeholder="https://ejemplo.com/tu-enlace"
+        autocomplete="off"
+        autocapitalize="none"
+        spellcheck="false"
       >
-        Crear enlace LC
-      </button>
 
-
-      <div id="message" class="message"></div>
-
-
-      <!-- RESULTADO -->
-      <div id="result" class="result">
-
-        <div class="result-title">
-          ✅ Tu enlace está listo:
-        </div>
-
-        <a
-          id="resultLink"
-          class="result-link"
-          href="#"
-          target="_blank"
-        ></a>
-
-        <div class="result-buttons">
-
-          <button
-            class="small-button"
-            onclick="copyResult()"
-          >
-            📋 Copiar
-          </button>
-
-          <button
-            class="small-button"
-            onclick="shareResult()"
-          >
-            📤 Compartir
-          </button>
-
-        </div>
-
-      </div>
+      <span class="hint">
+        Pega aquí la dirección completa que quieres acortar.
+      </span>
 
     </div>
 
 
-    <!-- MIS ENLACES -->
-    <div class="card">
+    <div class="field">
 
-      <h2 class="section-title">
-        Mis enlaces
-      </h2>
+      <label for="customCode">
+        ✏️ Nombre de tu acortación
+      </label>
 
-      <div
-        id="counter"
-        class="counter"
+      <input
+        type="text"
+        id="customCode"
+        placeholder="tunombre"
+        autocomplete="off"
+        autocapitalize="none"
+        spellcheck="false"
       >
-        Cargando enlaces...
+
+      <span class="hint">
+        Por ejemplo: tunombre, video, tienda, promo2026, etc.
+      </span>
+
+    </div>
+
+
+    <button
+      class="button"
+      onclick="createShortLink()"
+    >
+      Crear enlace LC
+    </button>
+
+
+    <div id="message" class="message"></div>
+
+
+    <!-- RESULTADO -->
+    <div id="result" class="result">
+
+      <div class="result-title">
+        ✅ Tu enlace está listo:
       </div>
 
-      <div id="linksList"></div>
+      <a
+        id="resultLink"
+        class="result-link"
+        href="#"
+        target="_blank"
+      ></a>
+
+      <div class="result-buttons">
+
+        <button
+          class="small-button"
+          onclick="copyResult()"
+        >
+          📋 Copiar
+        </button>
+
+        <button
+          class="small-button"
+          onclick="shareResult()"
+        >
+          📤 Compartir
+        </button>
+
+      </div>
 
     </div>
 
   </div>
 
 
+  <!-- MIS ENLACES -->
+  <div class="card">
+
+    <h2 class="section-title">
+      Mis enlaces
+    </h2>
+
+    <div id="counter" class="counter">
+      Cargando enlaces...
+    </div>
+
+    <div id="linksList"></div>
+
+  </div>
+
+</div>
+
+
 <script>
 
-  // ==========================
-  // SUPABASE
-  // ==========================
+const SUPABASE_URL =
+  "https://tfwepffzhuyppsavmoqw.supabase.co";
 
-  const SUPABASE_URL =
-    "https://tfwepffzhuyppsavmoqw.supabase.co";
-
-  const SUPABASE_KEY =
-    "sb_publishable_4DOmAEAQ5tQv8U5zGgMHLg_m8u6N06J";
+const SUPABASE_KEY =
+  "sb_publishable_4DOmAEAQ5tQv8U5zGgMHLg_m8u6N06J";
 
 
-  // ==========================
-  // ELEMENTOS
-  // ==========================
+const originalUrl =
+  document.getElementById("originalUrl");
 
-  const originalUrl =
-    document.getElementById("originalUrl");
+const customCode =
+  document.getElementById("customCode");
 
-  const customCode =
-    document.getElementById("customCode");
+const result =
+  document.getElementById("result");
 
-  const result =
-    document.getElementById("result");
+const resultLink =
+  document.getElementById("resultLink");
 
-  const resultLink =
-    document.getElementById("resultLink");
+const message =
+  document.getElementById("message");
 
-  const message =
-    document.getElementById("message");
+const linksList =
+  document.getElementById("linksList");
 
-  const linksList =
-    document.getElementById("linksList");
-
-  const counter =
-    document.getElementById("counter");
+const counter =
+  document.getElementById("counter");
 
 
-  // ==========================
-  // MENSAJES
-  // ==========================
+// ==========================
+// MENSAJES
+// ==========================
 
-  function showMessage(text, type) {
+function showMessage(text, type) {
 
-    message.textContent = text;
+  message.textContent = text;
 
-    message.className =
-      "message " + type;
+  message.className =
+    "message " + type;
 
-    message.style.display = "block";
+  message.style.display = "block";
 
+}
+
+
+function hideMessage() {
+
+  message.style.display = "none";
+
+}
+
+
+// ==========================
+// CREAR ENLACE
+// ==========================
+
+async function createShortLink() {
+
+  hideMessage();
+
+  result.style.display = "none";
+
+
+  const url =
+    originalUrl.value.trim();
+
+  const code =
+    customCode.value.trim();
+
+
+  if (!url) {
+
+    showMessage(
+      "Escribe primero el enlace original.",
+      "error"
+    );
+
+    return;
   }
 
 
-  function hideMessage() {
+  if (!code) {
 
-    message.style.display = "none";
+    showMessage(
+      "Escribe el nombre que tendrá tu acortación.",
+      "error"
+    );
 
+    return;
   }
 
 
-  // ==========================
-  // CREAR ENLACE
-  // ==========================
+  try {
 
-  async function createShortLink() {
+    new URL(url);
 
-    hideMessage();
+  } catch {
 
-    result.style.display = "none";
+    showMessage(
+      "El enlace original no parece válido.",
+      "error"
+    );
 
-
-    const url =
-      originalUrl.value.trim();
-
-    const code =
-      customCode.value.trim();
+    return;
+  }
 
 
-    if (!url) {
+  if (!/^[a-zA-Z0-9_-]+$/.test(code)) {
 
-      showMessage(
-        "Escribe primero el enlace original.",
-        "error"
-      );
+    showMessage(
+      "El nombre solo puede contener letras, números, guiones y guiones bajos.",
+      "error"
+    );
 
-      return;
-    }
-
-
-    if (!code) {
-
-      showMessage(
-        "Escribe el nombre que tendrá tu acortación.",
-        "error"
-      );
-
-      return;
-    }
+    return;
+  }
 
 
-    try {
+  try {
 
-      new URL(url);
-
-    } catch {
-
-      showMessage(
-        "El enlace original no parece válido.",
-        "error"
-      );
-
-      return;
-    }
-
-
-    if (!/^[a-zA-Z0-9_-]+$/.test(code)) {
-
-      showMessage(
-        "El nombre solo puede contener letras, números, guiones y guiones bajos.",
-        "error"
-      );
-
-      return;
-    }
-
-
-    try {
-
-      // Comprobar si existe
-      const checkResponse =
-        await fetch(
-          `${SUPABASE_URL}/rest/v1/Links?code=eq.${encodeURIComponent(code)}&select=code`,
-          {
-            headers: {
-              "apikey": SUPABASE_KEY,
-              "Authorization": `Bearer ${SUPABASE_KEY}`
-            }
+    const checkResponse =
+      await fetch(
+        `${SUPABASE_URL}/rest/v1/Links?code=eq.${encodeURIComponent(code)}&select=code`,
+        {
+          headers: {
+            "apikey": SUPABASE_KEY,
+            "Authorization": `Bearer ${SUPABASE_KEY}`
           }
-        );
-
-
-      const existing =
-        await checkResponse.json();
-
-
-      if (existing.length > 0) {
-
-        showMessage(
-          `El nombre "${code}" ya está ocupado. Elige otro.`,
-          "error"
-        );
-
-        return;
-      }
-
-
-      // Guardar
-      const insertResponse =
-        await fetch(
-          `${SUPABASE_URL}/rest/v1/Links`,
-          {
-            method: "POST",
-
-            headers: {
-              "apikey": SUPABASE_KEY,
-              "Authorization": `Bearer ${SUPABASE_KEY}`,
-              "Content-Type": "application/json",
-              "Prefer": "return=representation"
-            },
-
-            body: JSON.stringify({
-              code: code,
-              original_url: url
-            })
-          }
-        );
-
-
-      if (!insertResponse.ok) {
-
-        const errorText =
-          await insertResponse.text();
-
-        console.error(errorText);
-
-        showMessage(
-          "No se pudo guardar el enlace.",
-          "error"
-        );
-
-        return;
-      }
-
-
-      const shortUrl =
-        `${window.location.origin}${window.location.pathname}${code}`;
-
-
-      resultLink.href =
-        shortUrl;
-
-      resultLink.textContent =
-        shortUrl;
-
-      result.style.display =
-        "block";
-
-
-      showMessage(
-        "¡Enlace creado correctamente!",
-        "success"
+        }
       );
 
 
-      originalUrl.value = "";
+    const existing =
+      await checkResponse.json();
 
-      customCode.value = "";
 
-
-      loadLinks();
-
-    } catch (error) {
-
-      console.error(error);
+    if (existing.length > 0) {
 
       showMessage(
-        "Ocurrió un error al crear el enlace.",
+        `El nombre "${code}" ya está ocupado. Elige otro.`,
         "error"
       );
 
+      return;
     }
 
-  }
 
+    const insertResponse =
+      await fetch(
+        `${SUPABASE_URL}/rest/v1/Links`,
+        {
+          method: "POST",
 
-  // ==========================
-  // COPIAR RESULTADO
-  // ==========================
+          headers: {
+            "apikey": SUPABASE_KEY,
+            "Authorization": `Bearer ${SUPABASE_KEY}`,
+            "Content-Type": "application/json",
+            "Prefer": "return=representation"
+          },
 
-  async function copyResult() {
-
-    const url =
-      resultLink.textContent;
-
-
-    try {
-
-      await navigator.clipboard.writeText(url);
-
-      showMessage(
-        "Enlace copiado.",
-        "success"
+          body: JSON.stringify({
+            code: code,
+            original_url: url
+          })
+        }
       );
 
-    } catch {
+
+    if (!insertResponse.ok) {
 
       showMessage(
-        "No se pudo copiar automáticamente.",
+        "No se pudo guardar el enlace.",
         "error"
       );
 
+      return;
     }
+
+
+    const shortUrl =
+      `${window.location.origin}${window.location.pathname}${code}`;
+
+
+    resultLink.href =
+      shortUrl;
+
+    resultLink.textContent =
+      shortUrl;
+
+    result.style.display =
+      "block";
+
+
+    showMessage(
+      "¡Enlace creado correctamente!",
+      "success"
+    );
+
+
+    originalUrl.value = "";
+
+    customCode.value = "";
+
+
+    loadLinks();
+
+  } catch (error) {
+
+    console.error(error);
+
+    showMessage(
+      "Ocurrió un error al crear el enlace.",
+      "error"
+    );
 
   }
 
-
-  // ==========================
-  // COMPARTIR
-  // ==========================
-
-  async function shareResult() {
-
-    const url =
-      resultLink.textContent;
+}
 
 
-    if (navigator.share) {
+// ==========================
+// COPIAR
+// ==========================
 
-      try {
+async function copyResult() {
 
-        await navigator.share({
-          title: "LC ShortLinks",
-          text: "Mira este enlace:",
-          url: url
-        });
+  try {
 
-      } catch (error) {
+    await navigator.clipboard.writeText(
+      resultLink.textContent
+    );
 
-        console.log(error);
+    showMessage(
+      "Enlace copiado.",
+      "success"
+    );
 
-      }
+  } catch {
 
-    } else {
-
-      await copyResult();
-
-    }
+    showMessage(
+      "No se pudo copiar automáticamente.",
+      "error"
+    );
 
   }
 
+}
 
-  // ==========================
-  // CARGAR MIS ENLACES
-  // ==========================
 
-  async function loadLinks() {
+// ==========================
+// COMPARTIR
+// ==========================
+
+async function shareResult() {
+
+  const url =
+    resultLink.textContent;
+
+
+  if (navigator.share) {
 
     try {
 
-      const response =
-        await fetch(
-          `${SUPABASE_URL}/rest/v1/Links?select=code,original_url&order=code.asc`,
-          {
-            headers: {
-              "apikey": SUPABASE_KEY,
-              "Authorization": `Bearer ${SUPABASE_KEY}`
-            }
-          }
-        );
-
-
-      if (!response.ok) {
-
-        throw new Error(
-          "No se pudieron cargar los enlaces."
-        );
-
-      }
-
-
-      const links =
-        await response.json();
-
-
-      counter.textContent =
-        `${links.length} enlace${links.length === 1 ? "" : "s"} creado${links.length === 1 ? "" : "s"}`;
-
-
-      if (links.length === 0) {
-
-        linksList.innerHTML =
-          `<div class="empty">
-            Todavía no tienes enlaces creados.
-          </div>`;
-
-        return;
-      }
-
-
-      linksList.innerHTML = "";
-
-
-      links.forEach(link => {
-
-        const shortUrl =
-          `${window.location.origin}${window.location.pathname}${link.code}`;
-
-
-        const item =
-          document.createElement("div");
-
-        item.className =
-          "link-item";
-
-
-        item.innerHTML = `
-
-          <div class="link-code">
-            🔗 ${escapeHtml(link.code)}
-          </div>
-
-          <div class="link-original">
-            ${escapeHtml(link.original_url)}
-          </div>
-
-          <div class="link-url">
-            ${escapeHtml(shortUrl)}
-          </div>
-
-          <div class="link-buttons">
-
-            <button
-              onclick="openLink('${encodeURIComponent(shortUrl)}')"
-            >
-              Abrir
-            </button>
-
-            <button
-              onclick="copyLink('${encodeURIComponent(shortUrl)}')"
-            >
-              Copiar
-            </button>
-
-            <button
-              class="delete-button"
-              onclick="deleteLink('${encodeURIComponent(link.code)}')"
-            >
-              🗑️ Borrar
-            </button>
-
-          </div>
-
-        `;
-
-
-        linksList.appendChild(item);
-
+      await navigator.share({
+        title: "LC ShortLinks",
+        text: "Mira este enlace:",
+        url: url
       });
 
-
     } catch (error) {
 
-      console.error(error);
+      console.log(error);
 
-      counter.textContent =
-        "No se pudieron cargar los enlaces.";
+    }
+
+  } else {
+
+    await copyResult();
+
+  }
+
+}
+
+
+// ==========================
+// CARGAR ENLACES
+// ==========================
+
+async function loadLinks() {
+
+  try {
+
+    const response =
+      await fetch(
+        `${SUPABASE_URL}/rest/v1/Links?select=code,original_url,clicks&order=code.asc`,
+        {
+          headers: {
+            "apikey": SUPABASE_KEY,
+            "Authorization": `Bearer ${SUPABASE_KEY}`
+          }
+        }
+      );
+
+
+    if (!response.ok) {
+
+      throw new Error(
+        "No se pudieron cargar los enlaces."
+      );
+
+    }
+
+
+    const links =
+      await response.json();
+
+
+    counter.textContent =
+      `${links.length} enlace${links.length === 1 ? "" : "s"} creado${links.length === 1 ? "" : "s"}`;
+
+
+    if (links.length === 0) {
 
       linksList.innerHTML =
         `<div class="empty">
-          Ocurrió un error al cargar tus enlaces.
+          Todavía no tienes enlaces creados.
         </div>`;
 
+      return;
     }
+
+
+    linksList.innerHTML = "";
+
+
+    links.forEach(link => {
+
+      const shortUrl =
+        `${window.location.origin}${window.location.pathname}${link.code}`;
+
+
+      const clicks =
+        Number(link.clicks) || 0;
+
+
+      const item =
+        document.createElement("div");
+
+      item.className =
+        "link-item";
+
+
+      item.innerHTML = `
+
+        <div class="link-code">
+          🔗 ${escapeHtml(link.code)}
+        </div>
+
+        <div class="link-original">
+          ${escapeHtml(link.original_url)}
+        </div>
+
+        <div class="link-url">
+          ${escapeHtml(shortUrl)}
+        </div>
+
+        <div class="clicks">
+          📊 ${clicks} clic${clicks === 1 ? "" : "s"}
+        </div>
+
+        <div class="link-buttons">
+
+          <button
+            onclick="openLink('${encodeURIComponent(shortUrl)}')"
+          >
+            Abrir
+          </button>
+
+          <button
+            onclick="copyLink('${encodeURIComponent(shortUrl)}')"
+          >
+            Copiar
+          </button>
+
+          <button
+            class="delete-button"
+            onclick="deleteLink('${encodeURIComponent(link.code)}')"
+          >
+            🗑️ Borrar
+          </button>
+
+        </div>
+
+      `;
+
+
+      linksList.appendChild(item);
+
+    });
+
+
+  } catch (error) {
+
+    console.error(error);
+
+    counter.textContent =
+      "No se pudieron cargar los enlaces.";
+
+  }
+
+}
+
+
+// ==========================
+// BORRAR
+// ==========================
+
+async function deleteLink(encodedCode) {
+
+  const code =
+    decodeURIComponent(encodedCode);
+
+
+  if (!confirm(
+    `¿Seguro que quieres borrar el enlace "${code}"?`
+  )) {
+
+    return;
 
   }
 
 
-  // ==========================
-  // BORRAR ENLACE
-  // ==========================
+  try {
 
-  async function deleteLink(encodedCode) {
+    const response =
+      await fetch(
+        `${SUPABASE_URL}/rest/v1/Links?code=eq.${encodeURIComponent(code)}`,
+        {
+          method: "DELETE",
 
-    const code =
-      decodeURIComponent(encodedCode);
-
-
-    const confirmed =
-      confirm(
-        `¿Seguro que quieres borrar el enlace "${code}"?`
+          headers: {
+            "apikey": SUPABASE_KEY,
+            "Authorization": `Bearer ${SUPABASE_KEY}`
+          }
+        }
       );
 
 
-    if (!confirmed) {
+    if (!response.ok) {
+
+      showMessage(
+        "No se pudo borrar el enlace.",
+        "error"
+      );
 
       return;
-
     }
 
 
-    try {
-
-      const response =
-        await fetch(
-          `${SUPABASE_URL}/rest/v1/Links?code=eq.${encodeURIComponent(code)}`,
-          {
-            method: "DELETE",
-
-            headers: {
-              "apikey": SUPABASE_KEY,
-              "Authorization": `Bearer ${SUPABASE_KEY}`
-            }
-          }
-        );
+    showMessage(
+      `El enlace "${code}" fue borrado correctamente.`,
+      "success"
+    );
 
 
-      if (!response.ok) {
+    loadLinks();
 
-        const errorText =
-          await response.text();
+  } catch (error) {
 
-        console.error(errorText);
+    console.error(error);
 
-        showMessage(
-          "No se pudo borrar el enlace.",
-          "error"
-        );
-
-        return;
-      }
-
-
-      showMessage(
-        `El enlace "${code}" fue borrado correctamente.`,
-        "success"
-      );
-
-
-      // Recargar lista
-      loadLinks();
-
-
-    } catch (error) {
-
-      console.error(error);
-
-      showMessage(
-        "Ocurrió un error al borrar el enlace.",
-        "error"
-      );
-
-    }
+    showMessage(
+      "Ocurrió un error al borrar el enlace.",
+      "error"
+    );
 
   }
 
-
-  // ==========================
-  // ABRIR ENLACE
-  // ==========================
-
-  function openLink(encodedUrl) {
-
-    const url =
-      decodeURIComponent(encodedUrl);
-
-    window.open(url, "_blank");
-
-  }
+}
 
 
-  // ==========================
-  // COPIAR ENLACE
-  // ==========================
+// ==========================
+// ABRIR
+// ==========================
 
-  async function copyLink(encodedUrl) {
+function openLink(encodedUrl) {
 
-    const url =
-      decodeURIComponent(encodedUrl);
+  window.open(
+    decodeURIComponent(encodedUrl),
+    "_blank"
+  );
+
+}
 
 
-    try {
+// ==========================
+// COPIAR DE LA LISTA
+// ==========================
 
-      await navigator.clipboard.writeText(url);
+async function copyLink(encodedUrl) {
 
-      showMessage(
-        "Enlace copiado.",
-        "success"
-      );
+  try {
 
-    } catch {
+    await navigator.clipboard.writeText(
+      decodeURIComponent(encodedUrl)
+    );
 
-      showMessage(
-        "No se pudo copiar el enlace.",
-        "error"
-      );
+    showMessage(
+      "Enlace copiado.",
+      "success"
+    );
 
-    }
+  } catch {
+
+    showMessage(
+      "No se pudo copiar el enlace.",
+      "error"
+    );
 
   }
 
-
-  // ==========================
-  // SEGURIDAD HTML
-  // ==========================
-
-  function escapeHtml(text) {
-
-    return String(text)
-      .replace(/&/g, "&amp;")
-      .replace(/</g, "&lt;")
-      .replace(/>/g, "&gt;")
-      .replace(/"/g, "&quot;")
-      .replace(/'/g, "&#039;");
-
-  }
+}
 
 
-  // ==========================
-  // INICIAR
-  // ==========================
+// ==========================
+// SEGURIDAD
+// ==========================
 
-  loadLinks();
+function escapeHtml(text) {
+
+  return String(text)
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#039;");
+
+}
+
+
+// ==========================
+// INICIAR
+// ==========================
+
+loadLinks();
 
 </script>
 
