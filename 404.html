@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>LC ShortLinks</title>
+</head>
+
+<body>
+
+<p style="text-align:center;font-family:sans-serif;">
+  Redirigiendo...
+</p>
+
+<script>
+
+const SUPABASE_URL =
+"https://tfwepffzhuyppsavmoqw.supabase.co";
+
+const SUPABASE_KEY =
+"sb_publishable_4DOmAEAQ5tQv8U5zGgMHLg_m8u6N06J";
+
+
+async function redireccionar() {
+
+  const path =
+    window.location.pathname;
+
+  const base =
+    "/LC-ShortLinks/";
+
+  let code =
+    path.startsWith(base)
+      ? path.substring(base.length)
+      : "";
+
+  code =
+    decodeURIComponent(code)
+      .replace(/^\/+|\/+$/g, "");
+
+  if (!code || code === "index.html") {
+    window.location.replace(base);
+    return;
+  }
+
+  try {
+
+    const response = await fetch(
+      `${SUPABASE_URL}/rest/v1/Links?code=eq.${encodeURIComponent(code)}&select=original_url`,
+      {
+        headers: {
+          "apikey": SUPABASE_KEY,
+          "Authorization": `Bearer ${SUPABASE_KEY}`
+        }
+      }
+    );
+
+    if (!response.ok) {
+      throw new Error("Error consultando Supabase");
+    }
+
+    const data =
+      await response.json();
+
+    if (data.length > 0 && data[0].original_url) {
+
+      window.location.replace(
+        data[0].original_url
+      );
+
+    } else {
+
+      document.body.innerHTML = `
+        <div style="
+          font-family:sans-serif;
+          text-align:center;
+          padding:60px 20px;
+        ">
+          <h1>LC</h1>
+          <h2>Enlace no encontrado</h2>
+          <p>El enlace corto <b>/${code}</b> no existe.</p>
+          <a href="${base}">
+            Crear un enlace LC
+          </a>
+        </div>
+      `;
+
+    }
+
+  } catch (error) {
+
+    console.error(error);
+
+    document.body.innerHTML = `
+      <div style="
+        font-family:sans-serif;
+        text-align:center;
+        padding:60px 20px;
+      ">
+        <h2>Error de conexión</h2>
+        <p>No se pudo consultar el enlace.</p>
+      </div>
+    `;
+
+  }
+
+}
+
+redireccionar();
+
+</script>
+
+</body>
+</html>
