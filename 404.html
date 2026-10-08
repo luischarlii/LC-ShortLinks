@@ -1,10 +1,11 @@
+
 <!DOCTYPE html>
 <html lang="es">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>LC ShortLinks</title>
-
+  <meta name="viewport" content="width=device-width, initial-scale=1">
   <style>
     body {
       margin: 0;
@@ -14,204 +15,88 @@
       background: #f5f5f7;
       color: #111;
     }
-
     .box {
       max-width: 500px;
       margin: 60px auto;
       background: white;
       padding: 30px;
       border-radius: 18px;
-      box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+      box-shadow: 0 4px 15px rgba(0,0,0,.08);
     }
-
-    h1 {
-      font-size: 24px;
-    }
-
-    p {
-      color: #666;
-      line-height: 1.5;
-    }
+    p { color: #666; line-height: 1.5; }
   </style>
 </head>
-
 <body>
-
   <div class="box">
-
     <h1>🔗 LC ShortLinks</h1>
-
-    <p id="message">
-      Redirigiendo...
-    </p>
-
+    <p id="message">Redirigiendo...</p>
   </div>
 
-
 <script>
+const SUPABASE_URL = "https://tfwepffzhuyppsavmoqw.supabase.co";
+const SUPABASE_KEY = "sb_publishable_4DOmAEAQ5tQv8U5zGgMHLg_m8u6N06J";
 
-  // ==========================
-  // SUPABASE
-  // ==========================
+const base = "/LC-ShortLinks/";
+const path = window.location.pathname;
+let code = path.startsWith(base) ? path.substring(base.length) : "";
+code = decodeURIComponent(code).replace(/^\/+|\/+$/g, "");
 
-  const SUPABASE_URL =
-    "https://tfwepffzhuyppsavmoqw.supabase.co";
+function showError(text) {
+  document.getElementById("message").textContent = text;
+}
 
-  const SUPABASE_KEY =
-    "sb_publishable_4DOmAEAQ5tQv8U5zGgMHLg_m8u6N06J";
+async function redirectLink() {
+  if (!code || code === "404.html") {
+    showError("No se encontró el enlace.");
+    return;
+  }
 
+  try {
+    const response = await fetch(
+      `${SUPABASE_URL}/rest/v1/rpc/resolve_short_link`,
+      {
+        method: "POST",
+        headers: {
+          "apikey": SUPABASE_KEY,
+          "Authorization": `Bearer ${SUPABASE_KEY}`,
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({ p_code: code })
+      }
+    );
 
-  // ==========================
-  // OBTENER CÓDIGO
-  // ==========================
+    if (!response.ok) {
+      throw new Error("La función de redirección respondió con error.");
+    }
 
-  const path =
-    window.location.pathname;
+    const url = await response.json();
 
-
-  const base =
-    "/LC-ShortLinks/";
-
-
-  let code =
-    path.startsWith(base)
-      ? path.substring(base.length)
-      : "";
-
-
-  // Quitar "/" final
-  code =
-    code.replace(/^\/+|\/+$/g, "");
-
-
-  // ==========================
-  // BUSCAR ENLACE
-  // ==========================
-
-  async function redirectLink() {
-
-    if (!code) {
-
-      showError(
-        "No se encontró el enlace."
-      );
-
+    if (typeof url !== "string" || !url.trim()) {
+      showError("Enlace no encontrado.");
       return;
     }
 
-
+    let destination;
     try {
-
-      const response =
-        await fetch(
-          `${SUPABASE_URL}/rest/v1/Links?code=eq.${encodeURIComponent(code)}&select=original_url,clicks`,
-          {
-            headers: {
-              "apikey": SUPABASE_KEY,
-              "Authorization": `Bearer ${SUPABASE_KEY}`
-            }
-          }
-        );
-
-
-      if (!response.ok) {
-
-        throw new Error(
-          "Error al consultar el enlace."
-        );
-
-      }
-
-
-      const data =
-        await response.json();
-
-
-      if (!data.length) {
-
-        showError(
-          "Enlace no encontrado."
-        );
-
-        return;
-      }
-
-
-      const link =
-        data[0];
-
-
-      // ==========================
-      // SUMAR CLIC
-      // ==========================
-
-      const currentClicks =
-        Number(link.clicks) || 0;
-
-
-      const newClicks =
-        currentClicks + 1;
-
-
-      await fetch(
-        `${SUPABASE_URL}/rest/v1/Links?code=eq.${encodeURIComponent(code)}`,
-        {
-          method: "PATCH",
-
-          headers: {
-            "apikey": SUPABASE_KEY,
-            "Authorization": `Bearer ${SUPABASE_KEY}`,
-            "Content-Type": "application/json",
-            "Prefer": "return=minimal"
-          },
-
-          body: JSON.stringify({
-            clicks: newClicks
-          })
-        }
-      );
-
-
-      // ==========================
-      // REDIRECCIÓN
-      // ==========================
-
-      window.location.replace(
-        link.original_url
-      );
-
-    } catch (error) {
-
-      console.error(error);
-
-      showError(
-        "No se pudo procesar el enlace."
-      );
-
+      destination = new URL(url);
+    } catch {
+      showError("El destino del enlace no es válido.");
+      return;
     }
 
+    if (!["http:", "https:"].includes(destination.protocol)) {
+      showError("El destino del enlace no es válido.");
+      return;
+    }
+
+    window.location.replace(destination.href);
+  } catch (error) {
+    console.error(error);
+    showError("No se pudo procesar el enlace. Intenta de nuevo.");
   }
+}
 
-
-  // ==========================
-  // ERROR
-  // ==========================
-
-  function showError(text) {
-
-    document.getElementById("message")
-      .textContent = text;
-
-  }
-
-
-  // ==========================
-  // INICIAR
-  // ==========================
-
-  redirectLink();
-
+redirectLink();
 </script>
-
 </body>
 </html>
