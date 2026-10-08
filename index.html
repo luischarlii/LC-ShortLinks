@@ -200,6 +200,16 @@
       font-size: 13px;
     }
 
+    /* BOTÓN BORRAR */
+    .link-buttons .delete-button {
+      background: #ffe1e1;
+      color: #b00000;
+    }
+
+    .link-buttons .delete-button:active {
+      background: #ffcccc;
+    }
+
     .empty {
       text-align: center;
       color: #777;
@@ -253,11 +263,13 @@
       Crea tus propios enlaces cortos
     </p>
 
+
     <!-- CREAR ENLACE -->
     <div class="card">
 
       <!-- ENLACE ORIGINAL -->
       <div class="field">
+
         <label for="originalUrl">
           🔗 Enlace original
         </label>
@@ -274,11 +286,13 @@
         <span class="hint">
           Pega aquí la dirección completa que quieres acortar.
         </span>
+
       </div>
 
 
-      <!-- NOMBRE DEL ENLACE -->
+      <!-- NOMBRE -->
       <div class="field">
+
         <label for="customCode">
           ✏️ Nombre de tu acortación
         </label>
@@ -295,10 +309,11 @@
         <span class="hint">
           Por ejemplo: tunombre, video, tienda, promo2026, etc.
         </span>
+
       </div>
 
 
-      <!-- BOTÓN -->
+      <!-- CREAR -->
       <button
         class="button"
         id="createButton"
@@ -307,7 +322,9 @@
         Crear enlace LC
       </button>
 
+
       <div id="message" class="message"></div>
+
 
       <!-- RESULTADO -->
       <div id="result" class="result">
@@ -418,6 +435,7 @@
       "message " + type;
 
     message.style.display = "block";
+
   }
 
 
@@ -468,7 +486,6 @@
     }
 
 
-    // Validar URL
     try {
 
       new URL(url);
@@ -484,7 +501,6 @@
     }
 
 
-    // Validar nombre
     if (!/^[a-zA-Z0-9_-]+$/.test(code)) {
 
       showMessage(
@@ -498,7 +514,7 @@
 
     try {
 
-      // Comprobar si ya existe
+      // Comprobar si existe
       const checkResponse =
         await fetch(
           `${SUPABASE_URL}/rest/v1/Links?code=eq.${encodeURIComponent(code)}&select=code`,
@@ -526,7 +542,7 @@
       }
 
 
-      // Guardar en Supabase
+      // Guardar
       const insertResponse =
         await fetch(
           `${SUPABASE_URL}/rest/v1/Links`,
@@ -564,16 +580,18 @@
       }
 
 
-      // Crear URL corta
       const shortUrl =
         `${window.location.origin}${window.location.pathname}${code}`;
 
 
-      resultLink.href = shortUrl;
+      resultLink.href =
+        shortUrl;
 
-      resultLink.textContent = shortUrl;
+      resultLink.textContent =
+        shortUrl;
 
-      result.style.display = "block";
+      result.style.display =
+        "block";
 
 
       showMessage(
@@ -582,12 +600,11 @@
       );
 
 
-      // Limpiar campos
       originalUrl.value = "";
+
       customCode.value = "";
 
 
-      // Recargar lista
       loadLinks();
 
     } catch (error) {
@@ -605,13 +622,14 @@
 
 
   // ==========================
-  // COPIAR
+  // COPIAR RESULTADO
   // ==========================
 
   async function copyResult() {
 
     const url =
       resultLink.textContent;
+
 
     try {
 
@@ -761,6 +779,13 @@
               Copiar
             </button>
 
+            <button
+              class="delete-button"
+              onclick="deleteLink('${encodeURIComponent(link.code)}')"
+            >
+              🗑️ Borrar
+            </button>
+
           </div>
 
         `;
@@ -789,6 +814,85 @@
 
 
   // ==========================
+  // BORRAR ENLACE
+  // ==========================
+
+  async function deleteLink(encodedCode) {
+
+    const code =
+      decodeURIComponent(encodedCode);
+
+
+    const confirmed =
+      confirm(
+        `¿Seguro que quieres borrar el enlace "${code}"?`
+      );
+
+
+    if (!confirmed) {
+
+      return;
+
+    }
+
+
+    try {
+
+      const response =
+        await fetch(
+          `${SUPABASE_URL}/rest/v1/Links?code=eq.${encodeURIComponent(code)}`,
+          {
+            method: "DELETE",
+
+            headers: {
+              "apikey": SUPABASE_KEY,
+              "Authorization": `Bearer ${SUPABASE_KEY}`
+            }
+          }
+        );
+
+
+      if (!response.ok) {
+
+        const errorText =
+          await response.text();
+
+        console.error(errorText);
+
+        showMessage(
+          "No se pudo borrar el enlace.",
+          "error"
+        );
+
+        return;
+      }
+
+
+      showMessage(
+        `El enlace "${code}" fue borrado correctamente.`,
+        "success"
+      );
+
+
+      // Recargar lista
+      loadLinks();
+
+
+    } catch (error) {
+
+      console.error(error);
+
+      showMessage(
+        "Ocurrió un error al borrar el enlace.",
+        "error"
+      );
+
+    }
+
+  }
+
+
+  // ==========================
   // ABRIR ENLACE
   // ==========================
 
@@ -803,7 +907,7 @@
 
 
   // ==========================
-  // COPIAR ENLACE DE LA LISTA
+  // COPIAR ENLACE
   // ==========================
 
   async function copyLink(encodedUrl) {
