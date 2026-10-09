@@ -1,743 +1,736 @@
-
 <!DOCTYPE html>
 <html lang="es">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <meta name="theme-color" content="#101827">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#111111">
   <title>LC ShortLinks</title>
-  <meta name="description" content="Acorta y comparte enlaces con LC ShortLinks.">
-  <link rel="icon" href="./IMG_8655.png" type="image/png">
 
   <style>
-    :root {
-      color-scheme: dark;
-      --bg: #101827;
-      --panel: #192538;
-      --panel2: #26374e;
-      --text: #f5f7fb;
-      --muted: #a9b6c9;
-      --blue: #4285f4;
-      --border: #34445c;
-    }
-
     * { box-sizing: border-box; }
 
     body {
       margin: 0;
-      padding: 20px 14px calc(32px + env(safe-area-inset-bottom));
-      min-height: 100vh;
-      background: radial-gradient(ellipse at top, #243b59 0%, var(--bg) 65%);
-      color: var(--text);
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      padding: 24px 15px;
+      font-family: Arial, sans-serif;
+      background: #f5f5f7;
+      color: #111;
     }
 
-    .container { max-width: 760px; margin: auto; }
-
-    header { text-align: center; padding: 14px 0 24px; }
-
-    .logo {
-      width: 88px;
-      height: 88px;
-      object-fit: contain;
-      border-radius: 20px;
-      background: white;
-      padding: 4px;
+    .container {
+      max-width: 650px;
+      margin: auto;
     }
 
-    h1 { margin: 12px 0 6px; font-size: 30px; }
-    h2 { margin-top: 0; font-size: 21px; }
-    p { line-height: 1.5; }
-    .subtitle, .hint { color: var(--muted); }
+    header {
+      text-align: center;
+      margin-bottom: 25px;
+    }
+
+    header h1 { margin-bottom: 6px; }
+    header p { color: #666; }
 
     .card {
-      background: rgba(25, 37, 56, .97);
-      border: 1px solid var(--border);
-      border-radius: 18px;
-      padding: 20px;
+      background: white;
+      padding: 22px;
       margin-bottom: 18px;
-      box-shadow: 0 10px 30px #0002;
+      border-radius: 16px;
+      box-shadow: 0 4px 15px rgba(0,0,0,.06);
+    }
+
+    h2 {
+      font-size: 19px;
+      margin-top: 0;
     }
 
     label {
       display: block;
-      font-size: 14px;
-      font-weight: 600;
-      margin: 14px 0 7px;
+      font-weight: bold;
+      margin: 15px 0 7px;
     }
 
     input {
       width: 100%;
-      min-height: 46px;
-      border: 1px solid var(--border);
-      border-radius: 11px;
-      padding: 12px;
-      background: #101827;
-      color: var(--text);
+      padding: 13px;
+      border: 1px solid #ccc;
+      border-radius: 9px;
       font-size: 16px;
+      background: white;
     }
 
     button {
       border: 0;
-      border-radius: 11px;
+      border-radius: 9px;
       padding: 12px 15px;
-      min-height: 44px;
       font-size: 15px;
-      font-weight: 700;
+      font-weight: bold;
       cursor: pointer;
-      color: white;
-      background: var(--panel2);
+      margin-top: 12px;
     }
-
-    button:disabled { opacity: .55; }
 
     .main-button {
       width: 100%;
-      margin-top: 12px;
-      background: var(--blue);
+      background: #111;
+      color: white;
     }
 
-    .secondary { background: var(--panel2); }
-    .danger { background: #6b2935; }
-    .small { min-height: 38px; padding: 9px 11px; font-size: 13px; }
+    .secondary {
+      background: #e9e9ee;
+      color: #111;
+    }
+
+    .danger {
+      background: #ffe5e5;
+      color: #a00000;
+    }
+
+    .hint {
+      font-size: 13px;
+      color: #666;
+      line-height: 1.5;
+    }
 
     .message {
-      display: none;
-      margin-top: 14px;
-      padding: 12px;
-      border-radius: 10px;
-      overflow-wrap: anywhere;
       font-size: 14px;
+      line-height: 1.5;
+      overflow-wrap: anywhere;
     }
 
-    .message.success {
+    .link-item {
+      border: 1px solid #e4e4e8;
+      border-radius: 12px;
+      padding: 15px;
+      margin-top: 13px;
+    }
+
+    .short-link {
       display: block;
-      background: #123d36;
-      color: #a7f3d0;
+      color: #075ec7;
+      font-weight: bold;
+      overflow-wrap: anywhere;
+      margin: 10px 0;
     }
 
-    .message.error {
+    .original-link {
       display: block;
-      background: #4a2028;
-      color: #fecaca;
+      color: #666;
+      font-size: 13px;
+      overflow-wrap: anywhere;
     }
 
-    .topline {
+    .actions {
       display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 12px;
       flex-wrap: wrap;
+      gap: 7px;
     }
 
-    .link-card {
-      padding: 16px 0;
-      border-top: 1px solid var(--border);
+    .actions button {
+      margin-top: 8px;
     }
 
-    .link-card:first-child { border-top: 0; }
+    #appSection { display: none; }
 
-    .short-url {
-      color: #8ab4ff;
-      overflow-wrap: anywhere;
-      font-weight: 700;
-      margin: 8px 0;
-    }
-
-    .original-url {
-      color: var(--muted);
-      overflow-wrap: anywhere;
-      font-size: 13px;
-    }
-
-    .stats {
-      color: var(--muted);
-      font-size: 13px;
-      margin: 8px 0 12px;
-    }
-
-    .actions { display: flex; gap: 8px; flex-wrap: wrap; }
-    .actions button { flex: 1 1 auto; }
-    .empty { color: var(--muted); text-align: center; padding: 22px 0; }
-    .hidden { display: none !important; }
-
-    .modal {
+    #qrModal {
+      display: none;
       position: fixed;
       inset: 0;
-      z-index: 1000;
-      display: flex;
-      justify-content: center;
+      z-index: 10;
+      background: rgba(0,0,0,.65);
+      padding: 20px;
       align-items: center;
-      padding: 18px;
-      background: #000d;
+      justify-content: center;
     }
 
     .modal-content {
       width: 100%;
-      max-width: 420px;
-      max-height: 90vh;
-      overflow: auto;
-      background: var(--panel);
-      border: 1px solid var(--border);
-      border-radius: 18px;
-      padding: 18px;
+      max-width: 360px;
+      background: white;
+      border-radius: 16px;
+      padding: 22px;
       text-align: center;
     }
 
-    #qrDisplay {
-      width: 280px;
-      height: 280px;
-      max-width: 100%;
-      margin: 16px auto;
-      background: white;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      position: relative;
-      border-radius: 8px;
-      overflow: hidden;
-    }
-
     #qrCode {
-      width: 260px;
-      height: 260px;
       display: flex;
-      align-items: center;
       justify-content: center;
+      margin: 20px 0;
+      min-height: 20px;
     }
 
-    #qrCode canvas, #qrCode img {
+    #qrCode img, #qrCode canvas {
       max-width: 100%;
       height: auto;
     }
 
-    #qrLogo {
-      position: absolute;
-      width: 48px;
-      height: 48px;
-      object-fit: contain;
-      background: white;
-      padding: 3px;
-      border-radius: 8px;
-      border: 2px solid white;
-      pointer-events: none;
-    }
+    .hidden { display: none !important; }
 
     footer {
       text-align: center;
-      color: var(--muted);
+      color: #777;
       font-size: 12px;
-      padding: 12px;
+      padding: 15px;
     }
   </style>
 </head>
 
 <body>
-  <div class="container">
-    <header>
-      <img class="logo" src="./IMG_8655.png" alt="Logo LC">
-      <h1>LC ShortLinks</h1>
-      <p class="subtitle">Tus enlaces cortos, fáciles de compartir.</p>
-    </header>
+<div class="container">
 
-    <section id="loginCard" class="card">
-      <h2>Bienvenido</h2>
-      <p class="hint">Inicia sesión o crea una cuenta con tu correo electrónico.</p>
+  <header>
+    <h1>🔗 LC ShortLinks</h1>
+    <p>Enlaces cortos con tu propio nombre</p>
+  </header>
 
-      <form id="loginForm">
-        <label for="email">Correo electrónico</label>
-        <input id="email" type="email" autocomplete="username" required>
+  <section id="authSection" class="card">
+    <h2>Accede a tu cuenta</h2>
 
-        <label for="password">Contraseña</label>
-        <input id="password" type="password"
-               autocomplete="current-password" minlength="6" required>
+    <form id="loginForm">
+      <label for="email">Correo electrónico</label>
+      <input id="email" type="email"
+        placeholder="tucorreo@ejemplo.com" required>
 
-        <button class="main-button" type="submit" id="loginButton">
-          Entrar
-        </button>
+      <label for="password">Contraseña</label>
+      <input id="password" type="password"
+        placeholder="Tu contraseña" required>
 
-        <button class="main-button secondary" type="button" id="registerButton">
-          Crear cuenta nueva
+      <button class="main-button" type="submit">
+        Iniciar sesión
+      </button>
+    </form>
+
+    <button class="secondary" id="registerButton">
+      Crear cuenta nueva
+    </button>
+
+    <p id="authMessage" class="message" aria-live="polite"></p>
+  </section>
+
+  <section id="appSection">
+
+    <div class="card">
+      <p id="userInfo" class="hint"></p>
+
+      <button class="secondary" id="logoutButton">
+        Cerrar sesión
+      </button>
+    </div>
+
+    <div class="card">
+      <h2>Crear enlace corto</h2>
+
+      <form id="createForm">
+        <label for="originalUrl">Enlace original</label>
+        <input id="originalUrl" type="url"
+          placeholder="https://ejemplo.com/pagina" required>
+
+        <label for="tunombre">Nombre personalizado</label>
+        <input id="tunombre" type="text"
+          placeholder="mi-oferta"
+          maxlength="50"
+          pattern="[A-Za-z0-9_-]+"
+          title="Usa letras sin acentos, números, guiones o guiones bajos"
+          autocomplete="off"
+          required>
+
+        <p class="hint">
+          Este nombre aparecerá al final de tu enlace corto.
+          No uses espacios ni acentos.
+        </p>
+
+        <button class="main-button" id="createButton" type="submit">
+          Crear enlace corto
         </button>
       </form>
 
-      <div id="loginMessage" class="message" role="status"></div>
-    </section>
-
-    <section id="privateApp" class="hidden">
-      <div class="card">
-        <div class="topline">
-          <div>
-            <h2>Mi cuenta</h2>
-            <div id="accountEmail" class="hint"></div>
-          </div>
-          <button id="logoutButton" class="secondary small">Cerrar sesión</button>
-        </div>
-      </div>
-
-      <div class="card">
-        <h2>Crear enlace corto</h2>
-
-        <form id="createForm">
-          <label for="originalUrl">Enlace original</label>
-          <input id="originalUrl" type="url"
-                 placeholder="https://ejemplo.com/pagina" required>
-
-          <button class="main-button" id="createButton" type="submit">
-            Crear enlace corto
-          </button>
-        </form>
-
-        <div id="appMessage" class="message" role="status"></div>
-      </div>
-
-      <div class="card">
-        <div class="topline">
-          <h2>Mis enlaces</h2>
-          <button id="refreshButton" class="secondary small">Actualizar</button>
-        </div>
-
-        <div id="linksList">
-          <p class="empty">Cargando enlaces...</p>
-        </div>
-      </div>
-    </section>
-
-    <footer>LC ShortLinks · Enlaces rápidos y sencillos</footer>
-  </div>
-
-  <div id="qrModal" class="modal hidden" role="dialog"
-       aria-modal="true" aria-labelledby="qrTitle">
-    <div class="modal-content">
-      <h2 id="qrTitle">Código QR</h2>
-      <p class="hint">Escanea el código o mantén presionada la imagen para guardarla.</p>
-
-      <div id="qrDisplay">
-        <div id="qrCode"></div>
-        <img id="qrLogo" src="./IMG_8655.png" alt="Logo LC">
-      </div>
-
-      <p id="qrUrl" class="short-url"></p>
-      <button id="copyQrLink" class="main-button">Copiar enlace</button>
-      <button id="closeQr" class="main-button secondary">Cerrar</button>
+      <p id="createMessage" class="message" aria-live="polite"></p>
     </div>
+
+    <div class="card">
+      <h2>Mis enlaces</h2>
+      <button class="secondary" id="refreshButton">
+        Actualizar lista
+      </button>
+
+      <div id="linksList">
+        <p class="hint">Cargando enlaces...</p>
+      </div>
+    </div>
+
+  </section>
+
+  <footer>LC ShortLinks · Luis Charlii</footer>
+</div>
+
+<div id="qrModal" role="dialog" aria-modal="true"
+  aria-labelledby="qrTitle">
+  <div class="modal-content">
+    <h2 id="qrTitle">Código QR</h2>
+    <div id="qrCode"></div>
+    <p id="qrUrl" class="hint"></p>
+
+    <button class="main-button" id="downloadQRButton">
+      Descargar QR
+    </button>
+
+    <button class="secondary" id="closeQRButton">
+      Cerrar
+    </button>
   </div>
+</div>
 
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 
-  <script>
-    "use strict";
+<script>
+"use strict";
 
-    // CONFIGURACIÓN DEL PROYECTO SUPABASE
-    const SUPABASE_URL = "https://tfwepffzhuyppsavmoqw.supabase.co";
-    const SUPABASE_KEY = "sb_publishable_4DOmAEAQ5tQv8U5zGgMHLg_m8u6N06J";
+// CONFIGURACIÓN DE TU PROYECTO SUPABASE
+const SUPABASE_URL =
+  "https://tfwepffzhuyppsavmoqw.supabase.co";
 
-    const db = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-    const $ = id => document.getElementById(id);
+const SUPABASE_KEY =
+  "sb_publishable_4DOmAEAQ5tQv8U5zGgMHLg_m8u6N06J";
 
-    let currentUser = null;
-    let linksCache = [];
-    let activeQrUrl = "";
+const db = window.supabase.createClient(
+  SUPABASE_URL,
+  SUPABASE_KEY
+);
 
-    function showMessage(id, message, type) {
-      const element = $(id);
-      element.textContent = message;
-      element.className = "message " + type;
-      element.style.display = "block";
+const authSection = document.getElementById("authSection");
+const appSection = document.getElementById("appSection");
+const authMessage = document.getElementById("authMessage");
+const createMessage = document.getElementById("createMessage");
+const linksList = document.getElementById("linksList");
+
+let currentUser = null;
+let currentQRUrl = "";
+
+// Construye el enlace con la ruta de GitHub Pages.
+function getShortUrl(code) {
+  const base = new URL("./", window.location.href);
+  return new URL(encodeURIComponent(code), base).href;
+}
+
+function showMessage(element, message, isError = false) {
+  element.textContent = message;
+  element.style.color = isError ? "#b00020" : "#16733b";
+}
+
+function escapeHTML(value) {
+  return String(value ?? "").replace(/[&<>"']/g, function(char) {
+    return {
+      "&": "&amp;",
+      "<": "&lt;",
+      ">": "&gt;",
+      '"': "&quot;",
+      "'": "&#39;"
+    }[char];
+  });
+}
+
+function validDestination(value) {
+  try {
+    const url = new URL(value);
+    return url.protocol === "http:" || url.protocol === "https:";
+  } catch {
+    return false;
+  }
+}
+
+// REGISTRO
+document.getElementById("registerButton").addEventListener(
+  "click", async function() {
+    const email = document.getElementById("email").value.trim();
+    const password = document.getElementById("password").value;
+
+    if (!email || !password) {
+      showMessage(
+        authMessage,
+        "Escribe tu correo y contraseña para crear tu cuenta.",
+        true
+      );
+      return;
     }
 
-    function clearMessage(id) {
-      const element = $(id);
-      element.textContent = "";
-      element.className = "message";
-      element.style.display = "none";
+    if (password.length < 6) {
+      showMessage(
+        authMessage,
+        "La contraseña debe tener al menos 6 caracteres.",
+        true
+      );
+      return;
     }
 
-    function setSignedIn(user) {
-      currentUser = user || null;
+    showMessage(authMessage, "Creando cuenta...");
 
-      $("loginCard").classList.toggle("hidden", !!currentUser);
-      $("privateApp").classList.toggle("hidden", !currentUser);
-      $("accountEmail").textContent = currentUser ? currentUser.email : "";
+    const { data, error } = await db.auth.signUp({
+      email: email,
+      password: password
+    });
 
-      if (!currentUser) {
-        linksCache = [];
-        $("linksList").replaceChildren();
-      }
+    if (error) {
+      showMessage(authMessage, error.message, true);
+      return;
     }
 
-    function normalizeUrl(value) {
-      const url = new URL(value.trim());
+    if (data.session) {
+      showMessage(authMessage, "Cuenta creada correctamente.");
+    } else {
+      showMessage(
+        authMessage,
+        "Cuenta creada. Revisa tu correo para confirmar el registro y después inicia sesión."
+      );
+    }
+  }
+);
 
-      if (url.protocol !== "https:" && url.protocol !== "http:") {
-        throw new Error("Usa un enlace que comience con http:// o https://");
-      }
+// INICIAR SESIÓN
+document.getElementById("loginForm").addEventListener(
+  "submit", async function(event) {
+    event.preventDefault();
 
-      return url.href;
+    const email = document.getElementById("email").value.trim();
+    const password = document.getElementById("password").value;
+
+    showMessage(authMessage, "Iniciando sesión...");
+
+    const { error } = await db.auth.signInWithPassword({
+      email: email,
+      password: password
+    });
+
+    if (error) {
+      showMessage(authMessage, error.message, true);
+    }
+  }
+);
+
+// CERRAR SESIÓN
+document.getElementById("logoutButton").addEventListener(
+  "click", async function() {
+    const { error } = await db.auth.signOut();
+
+    if (error) {
+      alert("No se pudo cerrar sesión: " + error.message);
+    }
+  }
+);
+
+// ESTADO DE SESIÓN
+db.auth.onAuthStateChange(function(event, session) {
+  currentUser = session ? session.user : null;
+
+  if (currentUser) {
+    authSection.style.display = "none";
+    appSection.style.display = "block";
+
+    document.getElementById("userInfo").textContent =
+      "Sesión iniciada: " + currentUser.email;
+
+    if (event !== "INITIAL_SESSION") {
+      loadLinks();
+    }
+  } else {
+    authSection.style.display = "block";
+    appSection.style.display = "none";
+    linksList.innerHTML = "";
+  }
+});
+
+// CREAR ENLACE PERSONALIZADO
+document.getElementById("createForm").addEventListener(
+  "submit", async function(event) {
+    event.preventDefault();
+
+    if (!currentUser) {
+      showMessage(createMessage, "Inicia sesión primero.", true);
+      return;
     }
 
-    function getShortUrl(code) {
-      const base = new URL("./", window.location.href);
-      return new URL(encodeURIComponent(code), base).href;
+    const originalUrl =
+      document.getElementById("originalUrl").value.trim();
+
+    const slugInput =
+      document.getElementById("tunombre").value.trim();
+
+    const slug = slugInput.toLowerCase();
+
+    if (!validDestination(originalUrl)) {
+      showMessage(
+        createMessage,
+        "Escribe una dirección válida que empiece con https:// o http://.",
+        true
+      );
+      return;
     }
 
-    function makeCode(length = 7) {
-      const chars = "abcdefghijkmnopqrstuvwxyzABCDEFGHJKLMNPQRSTUVWXYZ23456789";
-      const random = new Uint32Array(length);
-      crypto.getRandomValues(random);
-
-      return Array.from(
-        random,
-        value => chars[value % chars.length]
-      ).join("");
+    if (!/^[a-zA-Z0-9_-]{1,50}$/.test(slugInput)) {
+      showMessage(
+        createMessage,
+        "El nombre solo puede contener letras, números, guiones y guiones bajos.",
+        true
+      );
+      return;
     }
 
-    async function loadLinks() {
-      if (!currentUser) return;
+    const button = document.getElementById("createButton");
+    button.disabled = true;
+    button.textContent = "Creando...";
+    showMessage(createMessage, "");
 
-      $("linksList").innerHTML = '<p class="empty">Cargando enlaces...</p>';
-
-      const { data, error } = await db
-        .from("Links")
-        .select("*")
-        .eq("user_id", currentUser.id)
-        .order("code", { ascending: true });
+    try {
+      /*
+       * Guardamos el nombre personalizado en code y codetext.
+       * El campo code mantiene compatibilidad con los enlaces
+       * que la función resolve_short_link busca por p_code.
+       */
+      const { error } = await db.from("Links").insert({
+        code: slug,
+        codetext: slug,
+        original_url: originalUrl,
+        clicks: 0,
+        user_id: currentUser.id
+      });
 
       if (error) {
-        showMessage(
-          "appMessage",
-          "No se pudieron cargar los enlaces: " + error.message,
-          "error"
-        );
-        return;
-      }
+        console.error("Error al crear enlace:", error);
 
-      linksCache = data || [];
-      renderLinks();
-    }
-
-    function renderLinks() {
-      const list = $("linksList");
-      list.replaceChildren();
-
-      if (!linksCache.length) {
-        const empty = document.createElement("p");
-        empty.className = "empty";
-        empty.textContent = "Todavía no tienes enlaces. ¡Crea el primero!";
-        list.appendChild(empty);
-        return;
-      }
-
-      linksCache.forEach(link => {
-        const item = document.createElement("div");
-        item.className = "link-card";
-
-        const shortUrl = getShortUrl(link.code);
-
-        const short = document.createElement("div");
-        short.className = "short-url";
-        short.textContent = shortUrl;
-
-        const original = document.createElement("div");
-        original.className = "original-url";
-        original.textContent = link.original_url;
-
-        const stats = document.createElement("div");
-        stats.className = "stats";
-        stats.textContent = "Clics registrados: " + (link.clicks ?? 0);
-
-        const actions = document.createElement("div");
-        actions.className = "actions";
-
-        const copyButton = document.createElement("button");
-        copyButton.className = "small";
-        copyButton.textContent = "Copiar";
-        copyButton.addEventListener("click", () => copyText(shortUrl));
-
-        const openButton = document.createElement("button");
-        openButton.className = "small";
-        openButton.textContent = "Abrir";
-        openButton.addEventListener("click", () => {
-          window.open(shortUrl, "_blank", "noopener,noreferrer");
-        });
-
-        const qrButton = document.createElement("button");
-        qrButton.className = "small";
-        qrButton.textContent = "Código QR";
-        qrButton.addEventListener("click", () => openQr(shortUrl));
-
-        const deleteButton = document.createElement("button");
-        deleteButton.className = "small danger";
-        deleteButton.textContent = "Eliminar";
-        deleteButton.addEventListener("click", () => deleteLink(link.code));
-
-        actions.append(copyButton, openButton, qrButton, deleteButton);
-        item.append(short, original, stats, actions);
-        list.appendChild(item);
-      });
-    }
-
-    async function createLink(event) {
-      event.preventDefault();
-      clearMessage("appMessage");
-
-      if (!currentUser) return;
-
-      const button = $("createButton");
-      button.disabled = true;
-      button.textContent = "Creando...";
-
-      try {
-        const originalUrl = normalizeUrl($("originalUrl").value);
-        let saved = false;
-        let lastError = null;
-
-        for (let attempt = 0; attempt < 4; attempt++) {
-          const code = makeCode();
-
-          const { error } = await db.from("Links").insert({
-            code: code,
-            original_url: originalUrl,
-            clicks: 0,
-            user_id: currentUser.id
-          });
-
-          if (!error) {
-            saved = true;
-            break;
-          }
-
-          lastError = error;
-
-          if (!/duplicate|unique/i.test(error.message || "")) {
-            break;
-          }
-        }
-
-        if (!saved) {
-          throw lastError || new Error("No se pudo guardar el enlace.");
-        }
-
-        $("originalUrl").value = "";
-        showMessage("appMessage", "¡Enlace creado correctamente!", "success");
-        await loadLinks();
-
-      } catch (error) {
-        showMessage(
-          "appMessage",
-          "Error al crear el enlace: " + (error?.message || error),
-          "error"
-        );
-      } finally {
-        button.disabled = false;
-        button.textContent = "Crear enlace corto";
-      }
-    }
-
-    async function deleteLink(code) {
-      if (!currentUser) return;
-      if (!confirm("¿Seguro que quieres eliminar este enlace?")) return;
-
-      const { error } = await db
-        .from("Links")
-        .delete()
-        .eq("code", code)
-        .eq("user_id", currentUser.id);
-
-      if (error) {
-        showMessage("appMessage", "No se pudo eliminar: " + error.message, "error");
-        return;
-      }
-
-      showMessage("appMessage", "Enlace eliminado.", "success");
-      await loadLinks();
-    }
-
-    async function copyText(text) {
-      try {
-        await navigator.clipboard.writeText(text);
-        showMessage("appMessage", "Enlace copiado al portapapeles.", "success");
-      } catch {
-        window.prompt("Copia este enlace:", text);
-      }
-    }
-
-    function openQr(url) {
-      activeQrUrl = url;
-      $("qrUrl").textContent = url;
-      $("qrCode").replaceChildren();
-      $("qrModal").classList.remove("hidden");
-
-      if (typeof QRCode === "undefined") {
-        $("qrModal").classList.add("hidden");
-        showMessage(
-          "appMessage",
-          "No se pudo cargar el generador QR. Comprueba tu conexión.",
-          "error"
-        );
-        return;
-      }
-
-      new QRCode($("qrCode"), {
-        text: url,
-        width: 260,
-        height: 260,
-        colorDark: "#000000",
-        colorLight: "#ffffff",
-        correctLevel: QRCode.CorrectLevel.H
-      });
-    }
-
-    $("closeQr").addEventListener("click", () => {
-      $("qrModal").classList.add("hidden");
-    });
-
-    $("qrModal").addEventListener("click", event => {
-      if (event.target === $("qrModal")) {
-        $("qrModal").classList.add("hidden");
-      }
-    });
-
-    $("copyQrLink").addEventListener("click", () => {
-      copyText(activeQrUrl);
-    });
-
-    // INICIAR SESIÓN
-    $("loginForm").addEventListener("submit", async event => {
-      event.preventDefault();
-      clearMessage("loginMessage");
-
-      const button = $("loginButton");
-      button.disabled = true;
-      button.textContent = "Entrando...";
-
-      try {
-        const { data, error } = await db.auth.signInWithPassword({
-          email: $("email").value.trim(),
-          password: $("password").value
-        });
-
-        if (error) throw error;
-
-        setSignedIn(data.user);
-        $("password").value = "";
-        await loadLinks();
-
-      } catch (error) {
-        showMessage(
-          "loginMessage",
-          "No se pudo iniciar sesión: " + error.message,
-          "error"
-        );
-      } finally {
-        button.disabled = false;
-        button.textContent = "Entrar";
-      }
-    });
-
-    // REGISTRAR CUENTA Y SOLICITAR CONFIRMACIÓN POR CORREO
-    $("registerButton").addEventListener("click", async () => {
-      clearMessage("loginMessage");
-
-      if (!$("loginForm").reportValidity()) return;
-
-      const email = $("email").value.trim();
-      const password = $("password").value;
-      const button = $("registerButton");
-
-      button.disabled = true;
-      button.textContent = "Creando cuenta...";
-
-      try {
-        const { data, error } = await db.auth.signUp({
-          email,
-          password,
-          options: {
-            emailRedirectTo:
-              window.location.origin + window.location.pathname
-          }
-        });
-
-        if (error) throw error;
-
-        $("password").value = "";
-
-        if (data.session && data.user) {
-          setSignedIn(data.user);
-          showMessage("appMessage", "¡Cuenta creada correctamente!", "success");
-          await loadLinks();
+        if (
+          error.code === "23505" ||
+          /duplicate|unique/i.test(error.message || "")
+        ) {
+          showMessage(
+            createMessage,
+            "Ese nombre ya está ocupado. Prueba con otro.",
+            true
+          );
         } else {
           showMessage(
-            "loginMessage",
-            "Registro iniciado. Revisa tu correo y abre el enlace de confirmación. Después inicia sesión. Revisa también Spam o Correo no deseado.",
-            "success"
+            createMessage,
+            "No se pudo crear el enlace: " + error.message,
+            true
           );
         }
 
-      } catch (error) {
-        showMessage(
-          "loginMessage",
-          "No se pudo crear la cuenta: " + error.message,
-          "error"
-        );
-      } finally {
-        button.disabled = false;
-        button.textContent = "Crear cuenta nueva";
-      }
-    });
-
-    // CERRAR SESIÓN
-    $("logoutButton").addEventListener("click", async () => {
-      const { error } = await db.auth.signOut();
-
-      if (error) {
-        showMessage("appMessage", "No se pudo cerrar sesión: " + error.message, "error");
         return;
       }
 
-      setSignedIn(null);
-      clearMessage("appMessage");
-      showMessage("loginMessage", "Sesión cerrada correctamente.", "success");
-    });
+      document.getElementById("createForm").reset();
 
-    // CREAR ENLACES Y ACTUALIZAR LA LISTA
-    $("createForm").addEventListener("submit", createLink);
+      showMessage(
+        createMessage,
+        "Enlace creado: " + getShortUrl(slug)
+      );
 
-    $("refreshButton").addEventListener("click", async () => {
-      clearMessage("appMessage");
       await loadLinks();
-    });
 
-    // RESTAURAR SESIÓN AL ABRIR LA APP
-    db.auth.onAuthStateChange((event, session) => {
-      setSignedIn(session ? session.user : null);
+    } catch (error) {
+      console.error(error);
+      showMessage(
+        createMessage,
+        "Ocurrió un error al crear el enlace.",
+        true
+      );
+    } finally {
+      button.disabled = false;
+      button.textContent = "Crear enlace corto";
+    }
+  }
+);
 
-      if (session) {
-        setTimeout(() => loadLinks(), 0);
-      }
-    });
+// CARGAR ENLACES DEL USUARIO
+async function loadLinks() {
+  if (!currentUser) return;
 
-    async function init() {
-      try {
-        const { data, error } = await db.auth.getSession();
-        if (error) throw error;
+  linksList.innerHTML = "<p class='hint'>Cargando enlaces...</p>";
 
-        setSignedIn(data.session ? data.session.user : null);
+  const { data, error } = await db
+    .from("Links")
+    .select("*")
+    .eq("user_id", currentUser.id)
+    .order("code", { ascending: true });
 
-        if (data.session) {
-          await loadLinks();
-        }
-      } catch (error) {
-        showMessage(
-          "loginMessage",
-          "No se pudo comprobar la sesión: " + error.message,
-          "error"
-        );
-      }
+  if (error) {
+    console.error(error);
+    linksList.innerHTML =
+      "<p class='message'>No se pudieron cargar los enlaces: " +
+      escapeHTML(error.message) + "</p>";
+    return;
+  }
+
+  renderLinks(data || []);
+}
+
+// MOSTRAR ENLACES
+function renderLinks(links) {
+  if (!links.length) {
+    linksList.innerHTML =
+      "<p class='hint'>Todavía no tienes enlaces guardados.</p>";
+    return;
+  }
+
+  linksList.innerHTML = links.map(function(link) {
+    const code = String(link.code || "");
+    const shortUrl = getShortUrl(code);
+    const originalUrl = String(link.original_url || "");
+    const displayName = String(link.codetext || link.code || "");
+
+    return `
+      <div class="link-item">
+        <strong>${escapeHTML(displayName)}</strong>
+
+        <a class="short-link"
+           href="${escapeHTML(shortUrl)}"
+           target="_blank"
+           rel="noopener noreferrer">
+          ${escapeHTML(shortUrl)}
+        </a>
+
+        <span class="original-link">
+          Destino: ${escapeHTML(originalUrl)}
+        </span>
+
+        <p class="hint">
+          Clics: ${Number(link.clicks) || 0}
+        </p>
+
+        <div class="actions">
+          <button class="secondary"
+            data-action="copy"
+            data-code="${escapeHTML(code)}">
+            Copiar
+          </button>
+
+          <button class="secondary"
+            data-action="qr"
+            data-code="${escapeHTML(code)}">
+            Crear QR
+          </button>
+
+          <button class="danger"
+            data-action="delete"
+            data-code="${escapeHTML(code)}">
+            Eliminar
+          </button>
+        </div>
+      </div>
+    `;
+  }).join("");
+}
+
+// ACCIONES DE CADA ENLACE
+linksList.addEventListener("click", async function(event) {
+  const button = event.target.closest("button[data-action]");
+  if (!button || !currentUser) return;
+
+  const action = button.dataset.action;
+  const code = button.dataset.code;
+  const shortUrl = getShortUrl(code);
+
+  if (action === "copy") {
+    try {
+      await navigator.clipboard.writeText(shortUrl);
+      alert("Enlace copiado:\n" + shortUrl);
+    } catch {
+      window.prompt("Copia tu enlace:", shortUrl);
+    }
+  }
+
+  if (action === "qr") {
+    openQR(shortUrl);
+  }
+
+  if (action === "delete") {
+    const confirmed = confirm(
+      "¿Seguro que quieres eliminar este enlace?"
+    );
+
+    if (!confirmed) return;
+
+    const { error } = await db
+      .from("Links")
+      .delete()
+      .eq("code", code)
+      .eq("user_id", currentUser.id);
+
+    if (error) {
+      alert("No se pudo eliminar: " + error.message);
+      return;
     }
 
-    init();
-  </script>
+    await loadLinks();
+  }
+});
+
+// ACTUALIZAR LISTA
+document.getElementById("refreshButton").addEventListener(
+  "click", loadLinks
+);
+
+// CÓDIGO QR
+function openQR(url) {
+  currentQRUrl = url;
+
+  document.getElementById("qrUrl").textContent = url;
+
+  const qrContainer = document.getElementById("qrCode");
+  qrContainer.innerHTML = "";
+
+  document.getElementById("qrModal").style.display = "flex";
+
+  if (typeof QRCode === "undefined") {
+    qrContainer.textContent =
+      "No se pudo cargar el generador QR. Revisa tu conexión.";
+    return;
+  }
+
+  new QRCode(qrContainer, {
+    text: url,
+    width: 220,
+    height: 220,
+    correctLevel: QRCode.CorrectLevel.H
+  });
+}
+
+document.getElementById("closeQRButton").addEventListener(
+  "click", function() {
+    document.getElementById("qrModal").style.display = "none";
+  }
+);
+
+document.getElementById("qrModal").addEventListener(
+  "click", function(event) {
+    if (event.target.id === "qrModal") {
+      event.currentTarget.style.display = "none";
+    }
+  }
+);
+
+document.getElementById("downloadQRButton").addEventListener(
+  "click", function() {
+    const qrContainer = document.getElementById("qrCode");
+    const canvas = qrContainer.querySelector("canvas");
+    const img = qrContainer.querySelector("img");
+
+    let dataUrl = "";
+
+    if (canvas) {
+      dataUrl = canvas.toDataURL("image/png");
+    } else if (img) {
+      dataUrl = img.src;
+    }
+
+    if (!dataUrl) {
+      alert("El código QR todavía no está listo.");
+      return;
+    }
+
+    const link = document.createElement("a");
+    link.href = dataUrl;
+    link.download = "LC-ShortLinks-QR.png";
+    link.click();
+  }
+);
+</script>
 </body>
 </html>
