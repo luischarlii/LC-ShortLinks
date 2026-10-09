@@ -169,76 +169,120 @@ function setSignedIn(user) {
 
 /* Generar QR y colocar el logo LC en el centro. */
 function renderQr(container, value) {
+
   if (typeof window.QRCode === "undefined") {
+
     showMessage("appMessage",
+
       "No se pudo cargar el generador QR. Revisa tu conexión.",
+
       "error");
+
     return false;
+
   }
 
   container.replaceChildren();
+
   container.dataset.logoReady = "false";
 
   try {
+
     new window.QRCode(container, {
+
       text: value,
+
       width: 300,
+
       height: 300,
+
       colorDark: "#111111",
+
       colorLight: "#ffffff",
+
       correctLevel: window.QRCode.CorrectLevel.H
+
     });
 
-    const canvas = container.querySelector("canvas");
-
-    if (!canvas) {
-      showMessage("appMessage",
-        "No se pudo preparar la imagen QR.",
-        "error");
-      return false;
-    }
-
-    const ctx = canvas.getContext("2d");
     const logo = new Image();
 
+    logo.crossOrigin = "anonymous";
+
     logo.onload = function() {
+
+      const canvas = container.querySelector("canvas");
+
+      if (!canvas) {
+
+        container.dataset.logoReady = "error";
+
+        return;
+
+      }
+
       try {
+
+        const ctx = canvas.getContext("2d");
+
         const size = canvas.width;
-        const logoSize = size * 0.20;
-        const backingSize = logoSize * 1.35;
+
+        const logoSize = size * 0.18;
+
+        const backingSize = size * 0.24;
+
         const x = (size - logoSize) / 2;
+
         const y = (size - logoSize) / 2;
+
         const bx = (size - backingSize) / 2;
+
         const by = (size - backingSize) / 2;
 
-        /* Fondo blanco detrás del logo para mejorar el contraste. */
         ctx.fillStyle = "#ffffff";
+
         ctx.fillRect(bx, by, backingSize, backingSize);
 
-        /* Logo de LC centrado. */
         ctx.drawImage(logo, x, y, logoSize, logoSize);
 
-        /* Actualiza también la imagen interna de la biblioteca. */
-        const qrImage = container.querySelector("img");
-        if (qrImage) {
-          qrImage.src = canvas.toDataURL("image/png");
-          qrImage.style.display = "none";
-        }
-
         container.dataset.logoReady = "true";
+
       } catch (error) {
-        console.error("Error al colocar el logo:", error);
+
+        console.error("Error al dibujar el logo:", error);
+
         container.dataset.logoReady = "error";
+
       }
+
     };
 
     logo.onerror = function() {
-      console.error("No se pudo cargar ./IMG_8655.png");
+
+      console.error("No se pudo cargar el logo LC.");
+
       container.dataset.logoReady = "error";
+
     };
 
-    logo.src = "./IMG_8655.png";
+    logo.src = "/LC-ShortLinks/IMG_8655.png";
+
     return true;
+
+  } catch (error) {
+
+    console.error("Error al generar QR:", error);
+
+    showMessage("appMessage",
+
+      "No se pudo generar el QR.",
+
+      "error");
+
+    return false;
+
+  }
+
+}
 
   } catch (error) {
     console.error("Error al crear QR:", error);
