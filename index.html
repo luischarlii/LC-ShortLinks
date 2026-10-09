@@ -234,6 +234,11 @@
       <button class="main-button" type="submit">
         Iniciar sesión
       </button>
+  
+<button class="secondary" id="forgotPasswordButton" type="button">
+  ¿Olvidaste tu contraseña?
+</button>
+ 
     </form>
 
     <button class="secondary" id="registerButton">
@@ -391,6 +396,46 @@ function validDestination(value) {
     return false;
   }
 }
+
+/* RECUPERAR CONTRASEÑA */
+document.getElementById("forgotPasswordButton").addEventListener(
+  "click", async function() {
+    const email = document.getElementById("email").value.trim();
+
+    if (!email) {
+      showMessage(
+        authMessage,
+        "Escribe tu correo electrónico primero.",
+        true
+      );
+      document.getElementById("email").focus();
+      return;
+    }
+
+    showMessage(authMessage, "Enviando correo de recuperación...");
+
+    const redirectUrl =
+      "https://luischarlii.github.io/LC-ShortLinks/";
+
+    const { error } = await db.auth.resetPasswordForEmail(email, {
+      redirectTo: redirectUrl
+    });
+
+    if (error) {
+      showMessage(
+        authMessage,
+        "No se pudo enviar el correo: " + error.message,
+        true
+      );
+      return;
+    }
+
+    showMessage(
+      authMessage,
+      "Si la cuenta existe, recibirás un correo con las instrucciones para recuperar tu contraseña. Revisa también el correo no deseado."
+    );
+  }
+);
 
 /* REGISTRO DE CUENTA */
 document.getElementById("registerButton").addEventListener(
