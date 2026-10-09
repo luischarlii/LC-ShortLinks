@@ -2,708 +2,742 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>LC ShortLinks</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#101827">
+  <title>LC ShortLinks</title>
+  <meta name="description" content="Acorta y comparte enlaces con LC ShortLinks.">
+  <link rel="icon" href="./IMG_8655.png" type="image/png">
 
-<style>
-*{box-sizing:border-box}
-body{margin:0;padding:20px 14px 40px;font-family:Arial,sans-serif;background:#f5f5f7;color:#111}
-.container{max-width:600px;margin:auto}
-.logo{display:block;width:85px;height:85px;object-fit:contain;margin:10px auto}
-h1{text-align:center;font-size:29px;margin:8px 0}
-.subtitle{text-align:center;color:#666;margin:0 0 24px}
-.card{background:white;border-radius:18px;padding:20px;margin-bottom:20px;box-shadow:0 4px 15px #0000000d}
-h2{font-size:21px;margin:0 0 16px}
-label{display:block;font-weight:bold;margin:15px 0 8px}
-input{display:block;width:100%;padding:14px;border:2px solid #ddd;border-radius:11px;font-size:16px;background:white;color:#111}
-button{cursor:pointer;border:0;border-radius:11px;padding:13px;font-size:15px;font-weight:bold}
-button:disabled{opacity:.6;cursor:wait}
-.main-button{width:100%;background:#111;color:white;margin-top:15px;min-height:48px}
-.secondary{background:#e8e8eb;color:#111}
-.danger{background:#ffe1e1;color:#a00000}
-.hidden{display:none!important}
-.message{display:none;padding:12px;margin-top:14px;border-radius:10px;overflow-wrap:anywhere;font-size:14px}
-.error{display:block;background:#ffe5e5;color:#a00000}
-.success{display:block;background:#e5f8e9;color:#176b2c}
-.hint{font-size:13px;color:#777;line-height:1.5}
-.link-item{background:#f7f7f8;border-radius:12px;padding:14px;margin:12px 0;overflow-wrap:anywhere}
-.link-code{font-size:17px;font-weight:bold;margin-bottom:8px}
-.link-original{font-size:13px;color:#666;margin-bottom:8px}
-.link-url{color:#0666c2;font-size:14px;margin-bottom:10px;overflow-wrap:anywhere}
-.clicks{display:inline-block;background:#e9e9ed;padding:7px 10px;border-radius:8px;font-size:13px;margin:0 0 12px}
-.actions{display:flex;flex-wrap:wrap;gap:7px}
-.actions button{flex:1;min-width:95px}
-.topline{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:12px}
-.topline h2{margin:0}
-#counter{font-size:14px;color:#777;margin-bottom:12px}
-.empty{text-align:center;color:#777;padding:20px 5px}
-.qr-box{margin-top:12px;padding:14px;background:white;border:1px solid #ddd;border-radius:12px;text-align:center}
-.qr-canvas{display:flex;justify-content:center;align-items:center;min-height:240px;margin:8px auto 12px;overflow:hidden}
-.qr-canvas canvas,.qr-canvas img{display:block;width:240px!important;height:240px!important;max-width:100%;object-fit:contain}
-.qr-box p{font-size:13px;color:#555;overflow-wrap:anywhere}
-.qr-box button{width:100%;margin-top:6px}
-#qrSaveView{position:fixed;inset:0;background:#f5f5f7;z-index:9999;overflow:auto;padding:24px 16px;text-align:center}
-#qrSaveView img{display:block;width:min(90vw,360px);height:auto;margin:20px auto;background:white}
-#qrSaveView p{line-height:1.5}
-</style>
+  <style>
+    :root {
+      color-scheme: dark;
+      --bg: #101827;
+      --panel: #192538;
+      --panel2: #26374e;
+      --text: #f5f7fb;
+      --muted: #a9b6c9;
+      --blue: #4285f4;
+      --border: #34445c;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      padding: 20px 14px calc(32px + env(safe-area-inset-bottom));
+      min-height: 100vh;
+      background: radial-gradient(ellipse at top, #243b59 0%, var(--bg) 65%);
+      color: var(--text);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+
+    .container { max-width: 760px; margin: auto; }
+
+    header { text-align: center; padding: 14px 0 24px; }
+
+    .logo {
+      width: 88px;
+      height: 88px;
+      object-fit: contain;
+      border-radius: 20px;
+      background: white;
+      padding: 4px;
+    }
+
+    h1 { margin: 12px 0 6px; font-size: 30px; }
+    h2 { margin-top: 0; font-size: 21px; }
+    p { line-height: 1.5; }
+    .subtitle, .hint { color: var(--muted); }
+
+    .card {
+      background: rgba(25, 37, 56, .97);
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      padding: 20px;
+      margin-bottom: 18px;
+      box-shadow: 0 10px 30px #0002;
+    }
+
+    label {
+      display: block;
+      font-size: 14px;
+      font-weight: 600;
+      margin: 14px 0 7px;
+    }
+
+    input {
+      width: 100%;
+      min-height: 46px;
+      border: 1px solid var(--border);
+      border-radius: 11px;
+      padding: 12px;
+      background: #101827;
+      color: var(--text);
+      font-size: 16px;
+    }
+
+    button {
+      border: 0;
+      border-radius: 11px;
+      padding: 12px 15px;
+      min-height: 44px;
+      font-size: 15px;
+      font-weight: 700;
+      cursor: pointer;
+      color: white;
+      background: var(--panel2);
+    }
+
+    button:disabled { opacity: .55; }
+
+    .main-button {
+      width: 100%;
+      margin-top: 12px;
+      background: var(--blue);
+    }
+
+    .secondary { background: var(--panel2); }
+    .danger { background: #6b2935; }
+    .small { min-height: 38px; padding: 9px 11px; font-size: 13px; }
+
+    .message {
+      display: none;
+      margin-top: 14px;
+      padding: 12px;
+      border-radius: 10px;
+      overflow-wrap: anywhere;
+      font-size: 14px;
+    }
+
+    .message.success {
+      display: block;
+      background: #123d36;
+      color: #a7f3d0;
+    }
+
+    .message.error {
+      display: block;
+      background: #4a2028;
+      color: #fecaca;
+    }
+
+    .topline {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .link-card {
+      padding: 16px 0;
+      border-top: 1px solid var(--border);
+    }
+
+    .link-card:first-child { border-top: 0; }
+
+    .short-url {
+      color: #8ab4ff;
+      overflow-wrap: anywhere;
+      font-weight: 700;
+      margin: 8px 0;
+    }
+
+    .original-url {
+      color: var(--muted);
+      overflow-wrap: anywhere;
+      font-size: 13px;
+    }
+
+    .stats {
+      color: var(--muted);
+      font-size: 13px;
+      margin: 8px 0 12px;
+    }
+
+    .actions { display: flex; gap: 8px; flex-wrap: wrap; }
+    .actions button { flex: 1 1 auto; }
+    .empty { color: var(--muted); text-align: center; padding: 22px 0; }
+    .hidden { display: none !important; }
+
+    .modal {
+      position: fixed;
+      inset: 0;
+      z-index: 1000;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 18px;
+      background: #000d;
+    }
+
+    .modal-content {
+      width: 100%;
+      max-width: 420px;
+      max-height: 90vh;
+      overflow: auto;
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      padding: 18px;
+      text-align: center;
+    }
+
+    #qrDisplay {
+      width: 280px;
+      height: 280px;
+      max-width: 100%;
+      margin: 16px auto;
+      background: white;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      position: relative;
+      border-radius: 8px;
+      overflow: hidden;
+    }
+
+    #qrCode {
+      width: 260px;
+      height: 260px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    #qrCode canvas, #qrCode img {
+      max-width: 100%;
+      height: auto;
+    }
+
+    #qrLogo {
+      position: absolute;
+      width: 48px;
+      height: 48px;
+      object-fit: contain;
+      background: white;
+      padding: 3px;
+      border-radius: 8px;
+      border: 2px solid white;
+      pointer-events: none;
+    }
+
+    footer {
+      text-align: center;
+      color: var(--muted);
+      font-size: 12px;
+      padding: 12px;
+    }
+  </style>
 </head>
 
 <body>
-<div class="container">
-  <img src="./IMG_8655.png" class="logo" alt="LC">
-  <h1>LC ShortLinks</h1>
-  <p class="subtitle">Tus enlaces, bajo tu control</p>
+  <div class="container">
+    <header>
+      <img class="logo" src="./IMG_8655.png" alt="Logo LC">
+      <h1>LC ShortLinks</h1>
+      <p class="subtitle">Tus enlaces cortos, fáciles de compartir.</p>
+    </header>
 
-  <section class="card" id="loginCard">
-    <h2>Iniciar sesión</h2>
+    <section id="loginCard" class="card">
+      <h2>Bienvenido</h2>
+      <p class="hint">Inicia sesión o crea una cuenta con tu correo electrónico.</p>
 
-<p class="hint">Entra con tu correo y contraseña o crea una cuenta nueva.</p>
+      <form id="loginForm">
+        <label for="email">Correo electrónico</label>
+        <input id="email" type="email" autocomplete="username" required>
 
-<form id="loginForm">
+        <label for="password">Contraseña</label>
+        <input id="password" type="password"
+               autocomplete="current-password" minlength="6" required>
 
-  <label for="email">Correo electrónico</label>
+        <button class="main-button" type="submit" id="loginButton">
+          Entrar
+        </button>
 
-  <input id="email" type="email" autocomplete="username" required>
-
-  <label for="password">Contraseña</label>
-
-  <input id="password" type="password" autocomplete="current-password" minlength="6" required>
-
-  <button class="main-button" type="submit" id="loginButton">
-
-    Entrar
-
-  </button>
-
-  <button class="main-button" type="button" id="registerButton">
-
-    Crear cuenta nueva
-
-  </button>
-
-</form>
-
-<div id="loginMessage" class="message"></div>
-
-</section>
-
-  <div id="privateApp" class="hidden">
-    <section class="card">
-      <div class="topline">
-        <h2>Mi cuenta</h2>
-        <button class="secondary" id="logoutButton" type="button">Cerrar sesión</button>
-      </div>
-      <p class="hint" id="accountEmail"></p>
-    </section>
-
-    <section class="card">
-      <h2>Crear enlace</h2>
-      <form id="createForm">
-        <label for="originalUrl">🔗 Enlace original</label>
-        <input id="originalUrl" type="url" placeholder="https://ejemplo.com" required autocomplete="url">
-        <label for="customCode">✏️ Nombre de tu acortación</label>
-        <input id="customCode" type="text" placeholder="tunombre" required maxlength="100" autocapitalize="none" autocomplete="off">
-        <p class="hint">Usa letras, números, guiones o guiones bajos.</p>
-        <button class="main-button" type="submit" id="createButton">Crear enlace LC</button>
+        <button class="main-button secondary" type="button" id="registerButton">
+          Crear cuenta nueva
+        </button>
       </form>
 
-      <div id="appMessage" class="message"></div>
+      <div id="loginMessage" class="message" role="status"></div>
+    </section>
 
-      <div id="result" class="hidden">
-        <p><strong>Tu enlace está listo:</strong></p>
-        <p><a id="resultLink" href="#" target="_blank" rel="noopener"></a></p>
-        <div class="actions">
-          <button class="secondary" id="copyResult" type="button">📋 Copiar</button>
-          <button class="secondary" id="shareResult" type="button">📤 Compartir</button>
-          <button class="secondary" id="showResultQr" type="button">▦ Ver QR</button>
+    <section id="privateApp" class="hidden">
+      <div class="card">
+        <div class="topline">
+          <div>
+            <h2>Mi cuenta</h2>
+            <div id="accountEmail" class="hint"></div>
+          </div>
+          <button id="logoutButton" class="secondary small">Cerrar sesión</button>
         </div>
-        <div id="resultQrBox" class="qr-box hidden">
-          <p>Escanea este código para abrir tu enlace corto.</p>
-          <div id="resultQr" class="qr-canvas"></div>
-          <button class="secondary" id="downloadResultQr" type="button">⬇️ Guardar QR</button>
+      </div>
+
+      <div class="card">
+        <h2>Crear enlace corto</h2>
+
+        <form id="createForm">
+          <label for="originalUrl">Enlace original</label>
+          <input id="originalUrl" type="url"
+                 placeholder="https://ejemplo.com/pagina" required>
+
+          <button class="main-button" id="createButton" type="submit">
+            Crear enlace corto
+          </button>
+        </form>
+
+        <div id="appMessage" class="message" role="status"></div>
+      </div>
+
+      <div class="card">
+        <div class="topline">
+          <h2>Mis enlaces</h2>
+          <button id="refreshButton" class="secondary small">Actualizar</button>
+        </div>
+
+        <div id="linksList">
+          <p class="empty">Cargando enlaces...</p>
         </div>
       </div>
     </section>
 
-    <section class="card">
-      <h2>Mis enlaces</h2>
-      <div id="counter">Cargando...</div>
-      <div id="linksList"></div>
-    </section>
+    <footer>LC ShortLinks · Enlaces rápidos y sencillos</footer>
   </div>
-</div>
 
-<div id="qrSaveView" class="hidden">
-  <h2>Guardar tu código QR</h2>
-  <p>Mantén pulsada la imagen y elige <strong>Guardar en Fotos</strong> o <strong>Guardar imagen</strong>, si aparece esa opción.</p>
-  <img id="qrSaveImage" alt="Código QR con logo LC">
-  <button id="closeQrSave" class="main-button" type="button">Volver a LC ShortLinks</button>
-</div>
+  <div id="qrModal" class="modal hidden" role="dialog"
+       aria-modal="true" aria-labelledby="qrTitle">
+    <div class="modal-content">
+      <h2 id="qrTitle">Código QR</h2>
+      <p class="hint">Escanea el código o mantén presionada la imagen para guardarla.</p>
 
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+      <div id="qrDisplay">
+        <div id="qrCode"></div>
+        <img id="qrLogo" src="./IMG_8655.png" alt="Logo LC">
+      </div>
 
-<script>
-const SUPABASE_URL = "https://tfwepffzhuyppsavmoqw.supabase.co";
-const SUPABASE_KEY = "sb_publishable_4DOmAEAQ5tQv8U5zGgMHLg_m8u6N06J";
-const db = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+      <p id="qrUrl" class="short-url"></p>
+      <button id="copyQrLink" class="main-button">Copiar enlace</button>
+      <button id="closeQr" class="main-button secondary">Cerrar</button>
+    </div>
+  </div>
 
-const $ = id => document.getElementById(id);
-let currentUser = null;
-let linksCache = [];
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 
-function showMessage(id, text, type) {
-  const el = $(id);
-  el.textContent = text;
-  el.className = "message " + type;
-}
+  <script>
+    "use strict";
 
-function clearMessage(id) {
-  $(id).textContent = "";
-  $(id).className = "message";
-}
+    // CONFIGURACIÓN DEL PROYECTO SUPABASE
+    const SUPABASE_URL = "https://tfwepffzhuyppsavmoqw.supabase.co";
+    const SUPABASE_KEY = "sb_publishable_4DOmAEAQ5tQv8U5zGgMHLg_m8u6N06J";
 
-function escapeHtml(value) {
-  return String(value).replace(/[&<>"']/g, c => ({
-    "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"
-  }[c]));
-}
+    const db = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+    const $ = id => document.getElementById(id);
 
-function shortUrl(code) {
-  return location.origin + location.pathname + encodeURIComponent(code);
-}
+    let currentUser = null;
+    let linksCache = [];
+    let activeQrUrl = "";
 
-function setSignedIn(user) {
-  currentUser = user;
-  $("loginCard").classList.toggle("hidden", !!user);
-  $("privateApp").classList.toggle("hidden", !user);
-  $("accountEmail").textContent = user ? user.email : "";
+    function showMessage(id, message, type) {
+      const element = $(id);
+      element.textContent = message;
+      element.className = "message " + type;
+      element.style.display = "block";
+    }
 
-  if (!user) {
-    $("linksList").replaceChildren();
-    $("counter").textContent = "";
-    linksCache = [];
-  }
-}
+    function clearMessage(id) {
+      const element = $(id);
+      element.textContent = "";
+      element.className = "message";
+      element.style.display = "none";
+    }
 
-/* Generar QR y colocar el logo LC en el centro. */
-function renderQr(container, value) {
+    function setSignedIn(user) {
+      currentUser = user || null;
 
-  if (typeof window.QRCode === "undefined") {
+      $("loginCard").classList.toggle("hidden", !!currentUser);
+      $("privateApp").classList.toggle("hidden", !currentUser);
+      $("accountEmail").textContent = currentUser ? currentUser.email : "";
 
-    showMessage("appMessage",
-
-      "No se pudo cargar el generador QR. Revisa tu conexión.",
-
-      "error");
-
-    return false;
-
-  }
-
-  container.replaceChildren();
-
-  container.dataset.logoReady = "false";
-
-  try {
-
-    new window.QRCode(container, {
-
-      text: value,
-
-      width: 300,
-
-      height: 300,
-
-      colorDark: "#111111",
-
-      colorLight: "#ffffff",
-
-      correctLevel: window.QRCode.CorrectLevel.H
-
-    });
-
-    const logo = new Image();
-
-    logo.crossOrigin = "anonymous";
-
-    logo.onload = function() {
-
-      const canvas = container.querySelector("canvas");
-
-      if (!canvas) {
-
-        container.dataset.logoReady = "error";
-
-        return;
-
+      if (!currentUser) {
+        linksCache = [];
+        $("linksList").replaceChildren();
       }
+    }
+
+    function normalizeUrl(value) {
+      const url = new URL(value.trim());
+
+      if (url.protocol !== "https:" && url.protocol !== "http:") {
+        throw new Error("Usa un enlace que comience con http:// o https://");
+      }
+
+      return url.href;
+    }
+
+    function getShortUrl(code) {
+      const base = new URL("./", window.location.href);
+      return new URL(encodeURIComponent(code), base).href;
+    }
+
+    function makeCode(length = 7) {
+      const chars = "abcdefghijkmnopqrstuvwxyzABCDEFGHJKLMNPQRSTUVWXYZ23456789";
+      const random = new Uint32Array(length);
+      crypto.getRandomValues(random);
+
+      return Array.from(
+        random,
+        value => chars[value % chars.length]
+      ).join("");
+    }
+
+    async function loadLinks() {
+      if (!currentUser) return;
+
+      $("linksList").innerHTML = '<p class="empty">Cargando enlaces...</p>';
+
+      const { data, error } = await db
+        .from("Links")
+        .select("*")
+        .eq("user_id", currentUser.id)
+        .order("code", { ascending: true });
+
+      if (error) {
+        showMessage(
+          "appMessage",
+          "No se pudieron cargar los enlaces: " + error.message,
+          "error"
+        );
+        return;
+      }
+
+      linksCache = data || [];
+      renderLinks();
+    }
+
+    function renderLinks() {
+      const list = $("linksList");
+      list.replaceChildren();
+
+      if (!linksCache.length) {
+        const empty = document.createElement("p");
+        empty.className = "empty";
+        empty.textContent = "Todavía no tienes enlaces. ¡Crea el primero!";
+        list.appendChild(empty);
+        return;
+      }
+
+      linksCache.forEach(link => {
+        const item = document.createElement("div");
+        item.className = "link-card";
+
+        const shortUrl = getShortUrl(link.code);
+
+        const short = document.createElement("div");
+        short.className = "short-url";
+        short.textContent = shortUrl;
+
+        const original = document.createElement("div");
+        original.className = "original-url";
+        original.textContent = link.original_url;
+
+        const stats = document.createElement("div");
+        stats.className = "stats";
+        stats.textContent = "Clics registrados: " + (link.clicks ?? 0);
+
+        const actions = document.createElement("div");
+        actions.className = "actions";
+
+        const copyButton = document.createElement("button");
+        copyButton.className = "small";
+        copyButton.textContent = "Copiar";
+        copyButton.addEventListener("click", () => copyText(shortUrl));
+
+        const openButton = document.createElement("button");
+        openButton.className = "small";
+        openButton.textContent = "Abrir";
+        openButton.addEventListener("click", () => {
+          window.open(shortUrl, "_blank", "noopener,noreferrer");
+        });
+
+        const qrButton = document.createElement("button");
+        qrButton.className = "small";
+        qrButton.textContent = "Código QR";
+        qrButton.addEventListener("click", () => openQr(shortUrl));
+
+        const deleteButton = document.createElement("button");
+        deleteButton.className = "small danger";
+        deleteButton.textContent = "Eliminar";
+        deleteButton.addEventListener("click", () => deleteLink(link.code));
+
+        actions.append(copyButton, openButton, qrButton, deleteButton);
+        item.append(short, original, stats, actions);
+        list.appendChild(item);
+      });
+    }
+
+    async function createLink(event) {
+      event.preventDefault();
+      clearMessage("appMessage");
+
+      if (!currentUser) return;
+
+      const button = $("createButton");
+      button.disabled = true;
+      button.textContent = "Creando...";
 
       try {
+        const originalUrl = normalizeUrl($("originalUrl").value);
+        let saved = false;
+        let lastError = null;
 
-        const ctx = canvas.getContext("2d");
+        for (let attempt = 0; attempt < 4; attempt++) {
+          const code = makeCode();
 
-        const size = canvas.width;
+          const { error } = await db.from("Links").insert({
+            code: code,
+            original_url: originalUrl,
+            clicks: 0,
+            user_id: currentUser.id
+          });
 
-        const logoSize = size * 0.18;
+          if (!error) {
+            saved = true;
+            break;
+          }
 
-        const backingSize = size * 0.24;
+          lastError = error;
 
-        const x = (size - logoSize) / 2;
-
-        const y = (size - logoSize) / 2;
-
-        const bx = (size - backingSize) / 2;
-
-        const by = (size - backingSize) / 2;
-
-        ctx.fillStyle = "#ffffff";
-
-        ctx.fillRect(bx, by, backingSize, backingSize);
-
-        ctx.drawImage(logo, x, y, logoSize, logoSize);
-
-        container.dataset.logoReady = "true";
-
-      } catch (error) {
-
-        console.error("Error al dibujar el logo:", error);
-
-        container.dataset.logoReady = "error";
-
-      }
-
-    };
-
-    logo.onerror = function() {
-
-      console.error("No se pudo cargar el logo LC.");
-
-      container.dataset.logoReady = "error";
-
-    };
-
-    logo.src = "/LC-ShortLinks/IMG_8655.png";
-
-    return true;
-
-  } catch (error) {
-
-    console.error("Error al generar QR:", error);
-
-    showMessage("appMessage",
-
-      "No se pudo generar el QR.",
-
-      "error");
-
-    return false;
-
-  }
-
-}
-
-  } catch (error) {
-    console.error("Error al crear QR:", error);
-    showMessage("appMessage", "No se pudo generar el QR.", "error");
-    return false;
-  }
-}
-
-function getQrDataUrl(container) {
-  const canvas = container.querySelector("canvas");
-  const img = container.querySelector("img");
-
-  try {
-    if (canvas) return canvas.toDataURL("image/png");
-
-    if (img && img.src.startsWith("data:image/")) {
-      return img.src;
-    }
-  } catch (error) {
-    console.error("Error al preparar imagen QR:", error);
-  }
-
-  return "";
-}
-
-function downloadQr(container, filename) {
-  const ready = container.dataset.logoReady;
-
-  if (ready === "false") {
-    showMessage("appMessage",
-      "El QR se está preparando. Espera un momento y vuelve a pulsar Guardar QR.",
-      "error");
-    return;
-  }
-
-  const dataUrl = getQrDataUrl(container);
-
-  if (!dataUrl) {
-    showMessage("appMessage",
-      "Primero pulsa Ver QR y espera a que aparezca.",
-      "error");
-    return;
-  }
-
-  /* En caso de que el logo no cargue, el QR sigue disponible. */
-  if (ready === "error") {
-    showMessage("appMessage",
-      "El QR se guardará sin logo porque no se pudo cargar la imagen LC.",
-      "error");
-  }
-
-  $("qrSaveImage").src = dataUrl;
-  $("qrSaveImage").alt = filename || "Código QR LC";
-  $("qrSaveView").classList.remove("hidden");
-}
-
-$("closeQrSave").addEventListener("click", () => {
-  $("qrSaveView").classList.add("hidden");
-});
-
-async function loadLinks() {
-  if (!currentUser) return;
-
-  $("counter").textContent = "Cargando enlaces...";
-
-  const {data, error} = await db
-    .from("Links")
-    .select("code,original_url,clicks")
-    .eq("user_id", currentUser.id)
-    .order("code", {ascending:true});
-
-  if (error) {
-    $("counter").textContent = "No se pudieron cargar los enlaces.";
-    console.error(error);
-    return;
-  }
-
-  linksCache = data || [];
-  $("counter").textContent =
-    `${linksCache.length} enlace${linksCache.length === 1 ? "" : "s"}`;
-
-  const list = $("linksList");
-  list.replaceChildren();
-
-  if (!linksCache.length) {
-    list.innerHTML = '<div class="empty">Todavía no tienes enlaces creados.</div>';
-    return;
-  }
-
-  linksCache.forEach(link => {
-    const item = document.createElement("div");
-    item.className = "link-item";
-    const destination = shortUrl(link.code);
-
-    item.innerHTML = `
-      <div class="link-code">🔗 ${escapeHtml(link.code)}</div>
-      <div class="link-original">${escapeHtml(link.original_url)}</div>
-      <div class="link-url">${escapeHtml(destination)}</div>
-      <div class="clicks">📊 ${Number(link.clicks) || 0} clic${Number(link.clicks) === 1 ? "" : "s"}</div>
-      <div class="actions">
-        <button class="secondary open-btn" type="button">Abrir</button>
-        <button class="secondary copy-btn" type="button">📋 Copiar</button>
-        <button class="secondary qr-btn" type="button">▦ Ver QR</button>
-        <button class="danger delete-btn" type="button">Borrar</button>
-      </div>
-      <div class="qr-box hidden">
-        <p>Escanea este código para abrir el enlace corto.</p>
-        <div class="qr-canvas"></div>
-        <button class="secondary download-qr" type="button">⬇️ Guardar QR</button>
-      </div>`;
-
-    item.querySelector(".open-btn").addEventListener("click", () => {
-      window.open(destination, "_blank", "noopener");
-    });
-
-    item.querySelector(".copy-btn").addEventListener("click", () => {
-      copyText(destination);
-    });
-
-    const qrBox = item.querySelector(".qr-box");
-    const qrContainer = item.querySelector(".qr-canvas");
-    const qrButton = item.querySelector(".qr-btn");
-
-    qrButton.addEventListener("click", () => {
-      const opening = qrBox.classList.contains("hidden");
-
-      if (opening) {
-        qrBox.classList.remove("hidden");
-
-        if (!qrContainer.hasChildNodes()) {
-          if (!renderQr(qrContainer, destination)) {
-            qrBox.classList.add("hidden");
-            return;
+          if (!/duplicate|unique/i.test(error.message || "")) {
+            break;
           }
         }
 
-        qrButton.textContent = "Ocultar QR";
+        if (!saved) {
+          throw lastError || new Error("No se pudo guardar el enlace.");
+        }
 
-        setTimeout(() => {
-          qrBox.scrollIntoView({
-            behavior:"smooth",
-            block:"nearest"
-          });
-        }, 100);
+        $("originalUrl").value = "";
+        showMessage("appMessage", "¡Enlace creado correctamente!", "success");
+        await loadLinks();
 
-      } else {
-        qrBox.classList.add("hidden");
-        qrButton.textContent = "▦ Ver QR";
+      } catch (error) {
+        showMessage(
+          "appMessage",
+          "Error al crear el enlace: " + (error?.message || error),
+          "error"
+        );
+      } finally {
+        button.disabled = false;
+        button.textContent = "Crear enlace corto";
       }
-    });
-
-    item.querySelector(".download-qr").addEventListener("click", () => {
-      downloadQr(qrContainer, "LC-ShortLinks-" + link.code + ".png");
-    });
-
-    item.querySelector(".delete-btn").addEventListener("click", () => {
-      deleteLink(link.code);
-    });
-
-    list.appendChild(item);
-  });
-}
-
-async function copyText(value) {
-  try {
-    if (navigator.clipboard && window.isSecureContext) {
-      await navigator.clipboard.writeText(value);
-    } else {
-      const temp = document.createElement("textarea");
-      temp.value = value;
-      temp.style.position = "fixed";
-      temp.style.opacity = "0";
-      document.body.appendChild(temp);
-      temp.select();
-      const copied = document.execCommand("copy");
-      temp.remove();
-
-      if (!copied) throw new Error("No se pudo copiar");
     }
 
-    showMessage("appMessage", "¡Enlace copiado!", "success");
+    async function deleteLink(code) {
+      if (!currentUser) return;
+      if (!confirm("¿Seguro que quieres eliminar este enlace?")) return;
 
-  } catch (error) {
-    showMessage("appMessage",
-      "No se pudo copiar automáticamente. Mantén pulsado el enlace para copiarlo.",
-      "error");
-  }
-}
+      const { error } = await db
+        .from("Links")
+        .delete()
+        .eq("code", code)
+        .eq("user_id", currentUser.id);
 
-$("loginForm").addEventListener("submit", async event => {
-  event.preventDefault();
-  clearMessage("loginMessage");
-  $("loginButton").disabled = true;
-  $("loginButton").textContent = "Entrando...";
-
-  try {
-    const {data, error} = await db.auth.signInWithPassword({
-      email: $("email").value.trim(),
-      password: $("password").value
-    });
-
-    if (error) throw error;
-
-    setSignedIn(data.user);
-    $("password").value = "";
-    await loadLinks();
-
-  } catch (error) {
-    showMessage("loginMessage",
-      "No se pudo iniciar sesión: " + error.message,
-      "error");
-  } finally {
-    $("loginButton").disabled = false;
-    $("loginButton").textContent = "Entrar";
-  }
-});
-
-$("logoutButton").addEventListener("click", async () => {
-  const {error} = await db.auth.signOut();
-
-  if (error) {
-    showMessage("appMessage",
-      "No se pudo cerrar sesión: " + error.message,
-      "error");
-  } else {
-    setSignedIn(null);
-    clearMessage("loginMessage");
-  }
-});
-
-$("createForm").addEventListener("submit", async event => {
-  event.preventDefault();
-  clearMessage("appMessage");
-  $("result").classList.add("hidden");
-  $("resultQrBox").classList.add("hidden");
-  $("resultQr").replaceChildren();
-  $("resultQr").dataset.logoReady = "";
-
-  if (!currentUser) {
-    showMessage("appMessage", "Inicia sesión primero.", "error");
-    return;
-  }
-
-  const url = $("originalUrl").value.trim();
-  const code = $("customCode").value.trim();
-
-  try {
-    const parsed = new URL(url);
-
-    if (!["http:", "https:"].includes(parsed.protocol)) {
-      throw new Error("Usa una dirección que empiece con https:// o http://.");
-    }
-  } catch {
-    showMessage("appMessage",
-      "Escribe una dirección web válida que empiece con https:// o http://.",
-      "error");
-    return;
-  }
-
-  if (!/^[a-zA-Z0-9_-]+$/.test(code)) {
-    showMessage("appMessage",
-      "El nombre solo puede contener letras, números, guiones y guiones bajos.",
-      "error");
-    return;
-  }
-
-  $("createButton").disabled = true;
-  $("createButton").textContent = "Guardando...";
-
-  try {
-    const {data: existing, error: checkError} = await db
-      .from("Links")
-      .select("code")
-      .eq("code", code)
-      .maybeSingle();
-
-    if (checkError) throw checkError;
-
-    if (existing) {
-      showMessage("appMessage",
-        `El nombre "${code}" ya está ocupado. Elige otro.`,
-        "error");
-      return;
-    }
-
-    const {error} = await db.from("Links").insert({
-      code,
-      original_url: url,
-      clicks: 0,
-      user_id: currentUser.id
-    });
-
-    if (error) throw error;
-
-    const destination = shortUrl(code);
-    $("resultLink").href = destination;
-    $("resultLink").textContent = destination;
-    $("result").classList.remove("hidden");
-    $("originalUrl").value = "";
-    $("customCode").value = "";
-
-    showMessage("appMessage", "¡Enlace creado correctamente!", "success");
-    await loadLinks();
-
-  } catch (error) {
-    console.error(error);
-    showMessage("appMessage", "Error al guardar: " + error.message, "error");
-  } finally {
-    $("createButton").disabled = false;
-    $("createButton").textContent = "Crear enlace LC";
-  }
-});
-
-$("copyResult").addEventListener("click", () => {
-  copyText($("resultLink").textContent);
-});
-
-$("shareResult").addEventListener("click", async () => {
-  const url = $("resultLink").textContent;
-
-  if (navigator.share) {
-    try {
-      await navigator.share({
-        title:"LC ShortLinks",
-        text:"Mira este enlace:",
-        url
-      });
-    } catch (error) {
-      if (error.name !== "AbortError") console.error(error);
-    }
-  } else {
-    await copyText(url);
-  }
-});
-
-$("showResultQr").addEventListener("click", () => {
-  const box = $("resultQrBox");
-  const opening = box.classList.contains("hidden");
-
-  if (opening) {
-    box.classList.remove("hidden");
-
-    if (!$("resultQr").hasChildNodes()) {
-      if (!renderQr($("resultQr"), $("resultLink").textContent)) {
-        box.classList.add("hidden");
+      if (error) {
+        showMessage("appMessage", "No se pudo eliminar: " + error.message, "error");
         return;
       }
+
+      showMessage("appMessage", "Enlace eliminado.", "success");
+      await loadLinks();
     }
 
-    $("showResultQr").textContent = "Ocultar QR";
-    box.scrollIntoView({behavior:"smooth", block:"nearest"});
+    async function copyText(text) {
+      try {
+        await navigator.clipboard.writeText(text);
+        showMessage("appMessage", "Enlace copiado al portapapeles.", "success");
+      } catch {
+        window.prompt("Copia este enlace:", text);
+      }
+    }
 
-  } else {
-    box.classList.add("hidden");
-    $("showResultQr").textContent = "▦ Ver QR";
-  }
-});
+    function openQr(url) {
+      activeQrUrl = url;
+      $("qrUrl").textContent = url;
+      $("qrCode").replaceChildren();
+      $("qrModal").classList.remove("hidden");
 
-$("downloadResultQr").addEventListener("click", () => {
-  downloadQr($("resultQr"), "LC-ShortLinks-QR.png");
-});
+      if (typeof QRCode === "undefined") {
+        $("qrModal").classList.add("hidden");
+        showMessage(
+          "appMessage",
+          "No se pudo cargar el generador QR. Comprueba tu conexión.",
+          "error"
+        );
+        return;
+      }
 
-async function deleteLink(code) {
-  if (!currentUser || !confirm(`¿Seguro que quieres borrar "${code}"?`)) return;
+      new QRCode($("qrCode"), {
+        text: url,
+        width: 260,
+        height: 260,
+        colorDark: "#000000",
+        colorLight: "#ffffff",
+        correctLevel: QRCode.CorrectLevel.H
+      });
+    }
 
-  const {error} = await db.from("Links")
-    .delete()
-    .eq("code", code)
-    .eq("user_id", currentUser.id);
+    $("closeQr").addEventListener("click", () => {
+      $("qrModal").classList.add("hidden");
+    });
 
-  if (error) {
-    showMessage("appMessage", "No se pudo borrar: " + error.message, "error");
-    return;
-  }
+    $("qrModal").addEventListener("click", event => {
+      if (event.target === $("qrModal")) {
+        $("qrModal").classList.add("hidden");
+      }
+    });
 
-  showMessage("appMessage", "Enlace borrado correctamente.", "success");
-  await loadLinks();
-}
+    $("copyQrLink").addEventListener("click", () => {
+      copyText(activeQrUrl);
+    });
 
-db.auth.onAuthStateChange((event, session) => {
-  setSignedIn(session ? session.user : null);
+    // INICIAR SESIÓN
+    $("loginForm").addEventListener("submit", async event => {
+      event.preventDefault();
+      clearMessage("loginMessage");
 
-  if (session) {
-    setTimeout(() => loadLinks(), 0);
-  }
-});
+      const button = $("loginButton");
+      button.disabled = true;
+      button.textContent = "Entrando...";
 
-(async function init() {
-  const {data, error} = await db.auth.getSession();
+      try {
+        const { data, error } = await db.auth.signInWithPassword({
+          email: $("email").value.trim(),
+          password: $("password").value
+        });
 
-  if (error) {
-    showMessage("loginMessage",
-      "No se pudo comprobar la sesión: " + error.message,
-      "error");
-    return;
-  }
+        if (error) throw error;
 
-  setSignedIn(data.session ? data.session.user : null);
+        setSignedIn(data.user);
+        $("password").value = "";
+        await loadLinks();
 
-  if (data.session) await loadLinks();
-})();
-</script>
+      } catch (error) {
+        showMessage(
+          "loginMessage",
+          "No se pudo iniciar sesión: " + error.message,
+          "error"
+        );
+      } finally {
+        button.disabled = false;
+        button.textContent = "Entrar";
+      }
+    });
+
+    // REGISTRAR CUENTA Y SOLICITAR CONFIRMACIÓN POR CORREO
+    $("registerButton").addEventListener("click", async () => {
+      clearMessage("loginMessage");
+
+      if (!$("loginForm").reportValidity()) return;
+
+      const email = $("email").value.trim();
+      const password = $("password").value;
+      const button = $("registerButton");
+
+      button.disabled = true;
+      button.textContent = "Creando cuenta...";
+
+      try {
+        const { data, error } = await db.auth.signUp({
+          email,
+          password,
+          options: {
+            emailRedirectTo:
+              window.location.origin + window.location.pathname
+          }
+        });
+
+        if (error) throw error;
+
+        $("password").value = "";
+
+        if (data.session && data.user) {
+          setSignedIn(data.user);
+          showMessage("appMessage", "¡Cuenta creada correctamente!", "success");
+          await loadLinks();
+        } else {
+          showMessage(
+            "loginMessage",
+            "Registro iniciado. Revisa tu correo y abre el enlace de confirmación. Después inicia sesión. Revisa también Spam o Correo no deseado.",
+            "success"
+          );
+        }
+
+      } catch (error) {
+        showMessage(
+          "loginMessage",
+          "No se pudo crear la cuenta: " + error.message,
+          "error"
+        );
+      } finally {
+        button.disabled = false;
+        button.textContent = "Crear cuenta nueva";
+      }
+    });
+
+    // CERRAR SESIÓN
+    $("logoutButton").addEventListener("click", async () => {
+      const { error } = await db.auth.signOut();
+
+      if (error) {
+        showMessage("appMessage", "No se pudo cerrar sesión: " + error.message, "error");
+        return;
+      }
+
+      setSignedIn(null);
+      clearMessage("appMessage");
+      showMessage("loginMessage", "Sesión cerrada correctamente.", "success");
+    });
+
+    // CREAR ENLACES Y ACTUALIZAR LA LISTA
+    $("createForm").addEventListener("submit", createLink);
+
+    $("refreshButton").addEventListener("click", async () => {
+      clearMessage("appMessage");
+      await loadLinks();
+    });
+
+    // RESTAURAR SESIÓN AL ABRIR LA APP
+    db.auth.onAuthStateChange((event, session) => {
+      setSignedIn(session ? session.user : null);
+
+      if (session) {
+        setTimeout(() => loadLinks(), 0);
+      }
+    });
+
+    async function init() {
+      try {
+        const { data, error } = await db.auth.getSession();
+        if (error) throw error;
+
+        setSignedIn(data.session ? data.session.user : null);
+
+        if (data.session) {
+          await loadLinks();
+        }
+      } catch (error) {
+        showMessage(
+          "loginMessage",
+          "No se pudo comprobar la sesión: " + error.message,
+          "error"
+        );
+      }
+    }
+
+    init();
+  </script>
 </body>
 </html>
