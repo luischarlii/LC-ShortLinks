@@ -249,7 +249,38 @@
   </section>
 
   <section id="appSection">
+<section id="resetSection" class="card hidden">
+  <h2>Crear nueva contraseña</h2>
+  <p>Escribe y confirma tu nueva contraseña.</p>
 
+  <form id="resetPasswordForm">
+    <label for="newPassword">Nueva contraseña</label>
+    <input
+      id="newPassword"
+      type="password"
+      minlength="6"
+      autocomplete="new-password"
+      placeholder="Mínimo 6 caracteres"
+      required
+    >
+
+    <label for="confirmPassword">Confirmar contraseña</label>
+    <input
+      id="confirmPassword"
+      type="password"
+      minlength="6"
+      autocomplete="new-password"
+      placeholder="Repite la contraseña"
+      required
+    >
+
+    <button class="main-button" type="submit">
+      Guardar nueva contraseña
+    </button>
+  </form>
+
+  <p id="resetMessage" class="message" aria-live="polite"></p>
+</section>
     <div class="card">
       <p id="userInfo" class="hint"></p>
 
@@ -436,7 +467,67 @@ document.getElementById("forgotPasswordButton").addEventListener(
     );
   }
 );
+/* GUARDAR NUEVA CONTRASEÑA */
+document.getElementById("resetPasswordForm").addEventListener(
+  "submit", async function(event) {
+    event.preventDefault();
 
+    const password = document.getElementById("newPassword").value;
+    const confirmation =
+      document.getElementById("confirmPassword").value;
+    const message = document.getElementById("resetMessage");
+
+    if (password.length < 6) {
+      showMessage(
+        message,
+        "La contraseña debe tener al menos 6 caracteres.",
+        true
+      );
+      return;
+    }
+
+    if (password !== confirmation) {
+      showMessage(
+        message,
+        "Las contraseñas no coinciden.",
+        true
+      );
+      return;
+    }
+
+    showMessage(message, "Guardando nueva contraseña...");
+
+    const { error } = await db.auth.updateUser({
+      password: password
+    });
+
+    if (error) {
+      showMessage(
+        message,
+        "No se pudo cambiar la contraseña: " + error.message,
+        true
+      );
+      return;
+    }
+
+    showMessage(message, "¡Contraseña actualizada correctamente!");
+
+    document.getElementById("resetPasswordForm").reset();
+    document.getElementById("resetSection").classList.add("hidden");
+
+    if (currentUser) {
+      authSection.style.display = "none";
+      appSection.style.display = "block";
+
+      document.getElementById("userInfo").textContent =
+        "Sesión iniciada: " + currentUser.email;
+
+      await loadLinks();
+    } else {
+      authSection.style.display = "block";
+    }
+  }
+);
 /* REGISTRO DE CUENTA */
 document.getElementById("registerButton").addEventListener(
   "click", async function() {
@@ -519,7 +610,13 @@ document.getElementById("logoutButton").addEventListener(
 /* ESTADO DE SESIÓN */
 db.auth.onAuthStateChange(function(event, session) {
   currentUser = session ? session.user : null;
-
+  if (event === "PASSWORD_RECOVERY") {
+    authSection.style.display = "none";
+    appSection.style.display = "none";
+    document.getElementById("resetSection")
+      .classList.remove("hidden");
+    return;
+  }
   if (currentUser) {
     authSection.style.display = "none";
     appSection.style.display = "block";
