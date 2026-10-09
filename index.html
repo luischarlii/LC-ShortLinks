@@ -1,947 +1,337 @@
+
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-  <title>LC ShortLinks</title>
-
-  <style>
-    * {
-      box-sizing: border-box;
-    }
-
-    body {
-      margin: 0;
-      padding: 20px 16px 40px;
-      font-family: Arial, sans-serif;
-      background: #f5f5f7;
-      color: #111;
-    }
-
-    .container {
-      max-width: 600px;
-      margin: 0 auto;
-    }
-
-    .logo {
-      display: block;
-      width: 90px;
-      height: 90px;
-      object-fit: contain;
-      margin: 10px auto 15px;
-    }
-
-    h1 {
-      text-align: center;
-      margin: 0 0 8px;
-      font-size: 30px;
-    }
-
-    .subtitle {
-      text-align: center;
-      color: #666;
-      margin: 0 0 30px;
-      font-size: 15px;
-    }
-
-    .card {
-      background: white;
-      border-radius: 18px;
-      padding: 22px;
-      box-shadow: 0 4px 15px rgba(0,0,0,0.08);
-      margin-bottom: 25px;
-    }
-
-    .field {
-      display: block;
-      width: 100%;
-      margin-bottom: 22px;
-    }
-
-    .field label {
-      display: block;
-      font-weight: bold;
-      font-size: 16px;
-      margin-bottom: 9px;
-    }
-
-    .field input {
-      display: block;
-      width: 100%;
-      min-height: 52px;
-      padding: 14px 15px;
-      border: 2px solid #d9d9de;
-      border-radius: 12px;
-      background: #fff;
-      color: #111;
-      font-size: 16px;
-      outline: none;
-      -webkit-appearance: none;
-    }
-
-    .field input:focus {
-      border-color: #111;
-    }
-
-    .hint {
-      display: block;
-      margin-top: 7px;
-      color: #777;
-      font-size: 13px;
-      line-height: 1.4;
-    }
-
-    .button {
-      display: block;
-      width: 100%;
-      min-height: 54px;
-      border: none;
-      border-radius: 13px;
-      background: #111;
-      color: white;
-      font-size: 17px;
-      font-weight: bold;
-      cursor: pointer;
-      margin-top: 5px;
-    }
-
-    .button:active {
-      transform: scale(0.98);
-    }
-
-    .result {
-      display: none;
-      margin-top: 20px;
-      padding: 16px;
-      background: #f1f1f3;
-      border-radius: 12px;
-      word-break: break-word;
-    }
-
-    .result-title {
-      font-weight: bold;
-      margin-bottom: 8px;
-    }
-
-    .result-link {
-      color: #0066cc;
-      text-decoration: none;
-      word-break: break-all;
-    }
-
-    .result-buttons {
-      display: flex;
-      gap: 10px;
-      margin-top: 14px;
-    }
-
-    .small-button {
-      flex: 1;
-      min-height: 44px;
-      border: none;
-      border-radius: 10px;
-      background: #ddd;
-      color: #111;
-      font-weight: bold;
-      font-size: 14px;
-    }
-
-    .section-title {
-      margin: 0 0 15px;
-      font-size: 22px;
-    }
-
-    .counter {
-      color: #777;
-      font-size: 14px;
-      margin-bottom: 15px;
-    }
-
-    .link-item {
-      background: #f7f7f8;
-      border-radius: 13px;
-      padding: 15px;
-      margin-bottom: 12px;
-    }
-
-    .link-code {
-      font-weight: bold;
-      font-size: 17px;
-      margin-bottom: 6px;
-    }
-
-    .link-original {
-      color: #666;
-      font-size: 13px;
-      word-break: break-all;
-      margin-bottom: 10px;
-    }
-
-    .link-url {
-      color: #0066cc;
-      font-size: 14px;
-      word-break: break-all;
-      margin-bottom: 10px;
-    }
-
-    /* CONTADOR DE CLICS */
-    .clicks {
-      display: inline-block;
-      background: #e9e9ed;
-      color: #333;
-      border-radius: 8px;
-      padding: 6px 10px;
-      font-size: 13px;
-      font-weight: bold;
-      margin-bottom: 12px;
-    }
-
-    .link-buttons {
-      display: flex;
-      gap: 8px;
-    }
-
-    .link-buttons button {
-      flex: 1;
-      min-height: 40px;
-      border: none;
-      border-radius: 9px;
-      background: #ddd;
-      font-weight: bold;
-      font-size: 13px;
-    }
-
-    .link-buttons .delete-button {
-      background: #ffe1e1;
-      color: #b00000;
-    }
-
-    .link-buttons .delete-button:active {
-      background: #ffcccc;
-    }
-
-    .empty {
-      text-align: center;
-      color: #777;
-      padding: 20px 5px;
-    }
-
-    .message {
-      margin-top: 15px;
-      padding: 12px;
-      border-radius: 10px;
-      display: none;
-      font-size: 14px;
-      line-height: 1.4;
-    }
-
-    .error {
-      background: #ffe5e5;
-      color: #a00000;
-    }
-
-    .success {
-      background: #e5f8e9;
-      color: #176b2c;
-    }
-
-    @media (max-width: 480px) {
-      body {
-        padding: 15px 12px 35px;
-      }
-
-      .card {
-        padding: 18px;
-      }
-
-      h1 {
-        font-size: 27px;
-      }
-    }
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>LC ShortLinks</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;padding:20px 14px 40px;font-family:Arial,sans-serif;background:#f5f5f7;color:#111}
+.container{max-width:600px;margin:auto}
+.logo{display:block;width:85px;height:85px;object-fit:contain;margin:10px auto}
+h1{text-align:center;font-size:29px;margin:8px 0}
+.subtitle{text-align:center;color:#666;margin:0 0 24px}
+.card{background:white;border-radius:18px;padding:20px;margin-bottom:20px;box-shadow:0 4px 15px #0000000d}
+h2{font-size:21px;margin:0 0 16px}
+label{display:block;font-weight:bold;margin:15px 0 8px}
+input{display:block;width:100%;padding:14px;border:2px solid #ddd;border-radius:11px;font-size:16px;background:white;color:#111}
+button{cursor:pointer;border:0;border-radius:11px;padding:13px;font-size:15px;font-weight:bold}
+.main-button{width:100%;background:#111;color:white;margin-top:15px;min-height:48px}
+.secondary{background:#e8e8eb;color:#111}
+.danger{background:#ffe1e1;color:#a00000}
+.hidden{display:none!important}
+.message{display:none;padding:12px;margin-top:14px;border-radius:10px;overflow-wrap:anywhere;font-size:14px}
+.error{display:block;background:#ffe5e5;color:#a00000}
+.success{display:block;background:#e5f8e9;color:#176b2c}
+.hint{font-size:13px;color:#777;line-height:1.5}
+.link-item{background:#f7f7f8;border-radius:12px;padding:14px;margin:12px 0;overflow-wrap:anywhere}
+.link-code{font-size:17px;font-weight:bold;margin-bottom:8px}
+.link-original{font-size:13px;color:#666;margin-bottom:8px}
+.link-url{color:#0666c2;font-size:14px;margin-bottom:10px}
+.clicks{display:inline-block;background:#e9e9ed;padding:7px 10px;border-radius:8px;font-size:13px;margin:0 0 12px}
+.actions{display:flex;flex-wrap:wrap;gap:7px}
+.actions button{flex:1;min-width:75px}
+.topline{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:12px}
+.topline h2{margin:0}
+#counter{font-size:14px;color:#777;margin-bottom:12px}
+.empty{text-align:center;color:#777;padding:20px 5px}
+</style>
 </head>
-
 <body>
-
 <div class="container">
-
   <img src="./IMG_8655.png" class="logo" alt="LC">
-
   <h1>LC ShortLinks</h1>
+  <p class="subtitle">Tus enlaces, bajo tu control</p>
 
-  <p class="subtitle">
-    Crea tus propios enlaces cortos
-  </p>
+  <section class="card" id="loginCard">
+    <h2>Iniciar sesión</h2>
+    <p class="hint">Entra con el correo y la contraseña de tu cuenta existente.</p>
+    <form id="loginForm">
+      <label for="email">Correo electrónico</label>
+      <input id="email" type="email" autocomplete="username" required>
+      <label for="password">Contraseña</label>
+      <input id="password" type="password" autocomplete="current-password" required>
+      <button class="main-button" type="submit" id="loginButton">Entrar</button>
+    </form>
+    <div id="loginMessage" class="message"></div>
+  </section>
 
-
-  <!-- CREAR ENLACE -->
-  <div class="card">
-
-    <div class="field">
-
-      <label for="originalUrl">
-        🔗 Enlace original
-      </label>
-
-      <input
-        type="url"
-        id="originalUrl"
-        placeholder="https://ejemplo.com/tu-enlace"
-        autocomplete="off"
-        autocapitalize="none"
-        spellcheck="false"
-      >
-
-      <span class="hint">
-        Pega aquí la dirección completa que quieres acortar.
-      </span>
-
-    </div>
-
-
-    <div class="field">
-
-      <label for="customCode">
-        ✏️ Nombre de tu acortación
-      </label>
-
-      <input
-        type="text"
-        id="customCode"
-        placeholder="tunombre"
-        autocomplete="off"
-        autocapitalize="none"
-        spellcheck="false"
-      >
-
-      <span class="hint">
-        Por ejemplo: tunombre, video, tienda, promo2026, etc.
-      </span>
-
-    </div>
-
-
-    <button
-      class="button"
-      onclick="createShortLink()"
-    >
-      Crear enlace LC
-    </button>
-
-
-    <div id="message" class="message"></div>
-
-
-    <!-- RESULTADO -->
-    <div id="result" class="result">
-
-      <div class="result-title">
-        ✅ Tu enlace está listo:
+  <div id="privateApp" class="hidden">
+    <section class="card">
+      <div class="topline">
+        <h2>Mi cuenta</h2>
+        <button class="secondary" id="logoutButton">Cerrar sesión</button>
       </div>
+      <p class="hint" id="accountEmail"></p>
+    </section>
 
-      <a
-        id="resultLink"
-        class="result-link"
-        href="#"
-        target="_blank"
-      ></a>
-
-      <div class="result-buttons">
-
-        <button
-          class="small-button"
-          onclick="copyResult()"
-        >
-          📋 Copiar
-        </button>
-
-        <button
-          class="small-button"
-          onclick="shareResult()"
-        >
-          📤 Compartir
-        </button>
-
+    <section class="card">
+      <h2>Crear enlace</h2>
+      <form id="createForm">
+        <label for="originalUrl">🔗 Enlace original</label>
+        <input id="originalUrl" type="url" placeholder="https://ejemplo.com" required autocomplete="url">
+        <label for="customCode">✏️ Nombre de tu acortación</label>
+        <input id="customCode" type="text" placeholder="tunombre" required maxlength="100" autocapitalize="none" autocomplete="off">
+        <p class="hint">Usa letras, números, guiones o guiones bajos.</p>
+        <button class="main-button" type="submit" id="createButton">Crear enlace LC</button>
+      </form>
+      <div id="appMessage" class="message"></div>
+      <div id="result" class="hidden">
+        <p><strong>Tu enlace está listo:</strong></p>
+        <p><a id="resultLink" href="#" target="_blank" rel="noopener"></a></p>
+        <div class="actions">
+          <button class="secondary" id="copyResult">📋 Copiar</button>
+          <button class="secondary" id="shareResult">📤 Compartir</button>
+        </div>
       </div>
+    </section>
 
-    </div>
-
+    <section class="card">
+      <h2>Mis enlaces</h2>
+      <div id="counter">Cargando...</div>
+      <div id="linksList"></div>
+    </section>
   </div>
-
-
-  <!-- MIS ENLACES -->
-  <div class="card">
-
-    <h2 class="section-title">
-      Mis enlaces
-    </h2>
-
-    <div id="counter" class="counter">
-      Cargando enlaces...
-    </div>
-
-    <div id="linksList"></div>
-
-  </div>
-
 </div>
 
-
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
+const SUPABASE_URL = "https://tfwepffzhuyppsavmoqw.supabase.co";
+const SUPABASE_KEY = "sb_publishable_4DOmAEAQ5tQv8U5zGgMHLg_m8u6N06J";
+const db = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-const SUPABASE_URL =
-  "https://tfwepffzhuyppsavmoqw.supabase.co";
+const $ = id => document.getElementById(id);
+let currentUser = null;
+let linksCache = [];
 
-const SUPABASE_KEY =
-  "sb_publishable_4DOmAEAQ5tQv8U5zGgMHLg_m8u6N06J";
-
-
-const originalUrl =
-  document.getElementById("originalUrl");
-
-const customCode =
-  document.getElementById("customCode");
-
-const result =
-  document.getElementById("result");
-
-const resultLink =
-  document.getElementById("resultLink");
-
-const message =
-  document.getElementById("message");
-
-const linksList =
-  document.getElementById("linksList");
-
-const counter =
-  document.getElementById("counter");
-
-
-// ==========================
-// MENSAJES
-// ==========================
-
-function showMessage(text, type) {
-
-  message.textContent = text;
-
-  message.className =
-    "message " + type;
-
-  message.style.display = "block";
-
+function showMessage(id, text, type) {
+  const el = $(id);
+  el.textContent = text;
+  el.className = "message " + type;
 }
-
-
-function hideMessage() {
-
-  message.style.display = "none";
-
+function clearMessage(id) {
+  $(id).textContent = "";
+  $(id).className = "message";
 }
+function escapeHtml(value) {
+  return String(value).replace(/[&<>"']/g, c => ({
+    "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"
+  }[c]));
+}
+function shortUrl(code) {
+  return location.origin + location.pathname + encodeURIComponent(code);
+}
+function setSignedIn(user) {
+  currentUser = user;
+  $("loginCard").classList.toggle("hidden", !!user);
+  $("privateApp").classList.toggle("hidden", !user);
+  $("accountEmail").textContent = user ? user.email : "";
+  if (!user) {
+    $("linksList").replaceChildren();
+    $("counter").textContent = "";
+    linksCache = [];
+  }
+}
+async function loadLinks() {
+  if (!currentUser) return;
+  $("counter").textContent = "Cargando enlaces...";
+  const {data, error} = await db
+    .from("Links")
+    .select("code,original_url,clicks")
+    .eq("user_id", currentUser.id)
+    .order("code", {ascending:true});
 
-
-// ==========================
-// CREAR ENLACE
-// ==========================
-
-async function createShortLink() {
-
-  hideMessage();
-
-  result.style.display = "none";
-
-
-  const url =
-    originalUrl.value.trim();
-
-  const code =
-    customCode.value.trim();
-
-
-  if (!url) {
-
-    showMessage(
-      "Escribe primero el enlace original.",
-      "error"
-    );
-
+  if (error) {
+    $("counter").textContent = "No se pudieron cargar los enlaces.";
+    console.error(error);
     return;
   }
 
+  linksCache = data || [];
+  $("counter").textContent =
+    `${linksCache.length} enlace${linksCache.length === 1 ? "" : "s"}`;
 
-  if (!code) {
+  const list = $("linksList");
+  list.replaceChildren();
 
-    showMessage(
-      "Escribe el nombre que tendrá tu acortación.",
-      "error"
-    );
-
+  if (!linksCache.length) {
+    list.innerHTML = '<div class="empty">Todavía no tienes enlaces creados.</div>';
     return;
   }
 
+  linksCache.forEach(link => {
+    const item = document.createElement("div");
+    item.className = "link-item";
+    const destination = shortUrl(link.code);
+    item.innerHTML = `
+      <div class="link-code">🔗 ${escapeHtml(link.code)}</div>
+      <div class="link-original">${escapeHtml(link.original_url)}</div>
+      <div class="link-url">${escapeHtml(destination)}</div>
+      <div class="clicks">📊 ${Number(link.clicks) || 0} clic${Number(link.clicks) === 1 ? "" : "s"}</div>
+      <div class="actions">
+        <button class="secondary open-btn">Abrir</button>
+        <button class="secondary copy-btn">Copiar</button>
+        <button class="danger delete-btn">Borrar</button>
+      </div>`;
+    item.querySelector(".open-btn").addEventListener("click", () => {
+      window.open(destination, "_blank", "noopener");
+    });
+    item.querySelector(".copy-btn").addEventListener("click", () => copyText(destination));
+    item.querySelector(".delete-btn").addEventListener("click", () => deleteLink(link.code));
+    list.appendChild(item);
+  });
+}
+async function copyText(value) {
+  try {
+    await navigator.clipboard.writeText(value);
+    showMessage("appMessage", "Enlace copiado.", "success");
+  } catch {
+    showMessage("appMessage", "No se pudo copiar automáticamente.", "error");
+  }
+}
+
+$("loginForm").addEventListener("submit", async event => {
+  event.preventDefault();
+  clearMessage("loginMessage");
+  $("loginButton").disabled = true;
+  $("loginButton").textContent = "Entrando...";
+  try {
+    const {data, error} = await db.auth.signInWithPassword({
+      email: $("email").value.trim(),
+      password: $("password").value
+    });
+    if (error) throw error;
+    setSignedIn(data.user);
+    $("password").value = "";
+    await loadLinks();
+  } catch (error) {
+    showMessage("loginMessage", "No se pudo iniciar sesión: " + error.message, "error");
+  } finally {
+    $("loginButton").disabled = false;
+    $("loginButton").textContent = "Entrar";
+  }
+});
+
+$("logoutButton").addEventListener("click", async () => {
+  const {error} = await db.auth.signOut();
+  if (error) {
+    showMessage("appMessage", "No se pudo cerrar sesión: " + error.message, "error");
+  } else {
+    setSignedIn(null);
+    clearMessage("loginMessage");
+  }
+});
+
+$("createForm").addEventListener("submit", async event => {
+  event.preventDefault();
+  clearMessage("appMessage");
+  $("result").classList.add("hidden");
+
+  if (!currentUser) {
+    showMessage("appMessage", "Inicia sesión primero.", "error");
+    return;
+  }
+
+  const url = $("originalUrl").value.trim();
+  const code = $("customCode").value.trim();
 
   try {
-
-    new URL(url);
-
+    const parsed = new URL(url);
+    if (!["http:", "https:"].includes(parsed.protocol)) throw new Error("Usa una dirección que empiece con https:// o http://.");
   } catch {
-
-    showMessage(
-      "El enlace original no parece válido.",
-      "error"
-    );
-
+    showMessage("appMessage", "Escribe una dirección web válida que empiece con https:// o http://.", "error");
     return;
   }
-
 
   if (!/^[a-zA-Z0-9_-]+$/.test(code)) {
-
-    showMessage(
-      "El nombre solo puede contener letras, números, guiones y guiones bajos.",
-      "error"
-    );
-
+    showMessage("appMessage", "El nombre solo puede contener letras, números, guiones y guiones bajos.", "error");
     return;
   }
 
-
+  $("createButton").disabled = true;
+  $("createButton").textContent = "Guardando...";
   try {
+    const {data: existing, error: checkError} = await db
+      .from("Links").select("code").eq("code", code).maybeSingle();
 
-    const checkResponse =
-      await fetch(
-        `${SUPABASE_URL}/rest/v1/Links?code=eq.${encodeURIComponent(code)}&select=code`,
-        {
-          headers: {
-            "apikey": SUPABASE_KEY,
-            "Authorization": `Bearer ${SUPABASE_KEY}`
-          }
-        }
-      );
-
-
-    const existing =
-      await checkResponse.json();
-
-
-    if (existing.length > 0) {
-
-      showMessage(
-        `El nombre "${code}" ya está ocupado. Elige otro.`,
-        "error"
-      );
-
+    if (checkError) throw checkError;
+    if (existing) {
+      showMessage("appMessage", `El nombre "${code}" ya está ocupado. Elige otro.`, "error");
       return;
     }
 
-
-    const insertResponse =
-      await fetch(
-        `${SUPABASE_URL}/rest/v1/Links`,
-        {
-          method: "POST",
-
-          headers: {
-            "apikey": SUPABASE_KEY,
-            "Authorization": `Bearer ${SUPABASE_KEY}`,
-            "Content-Type": "application/json",
-            "Prefer": "return=representation"
-          },
-
-          body: JSON.stringify({
-            code: code,
-            original_url: url
-          })
-        }
-      );
-
-
-    
-if (!insertResponse.ok) {
-  const errorDetails = await insertResponse.text();
-
-  console.error("Error de Supabase:", errorDetails);
-
-  showMessage(
-    "Error al guardar: " + errorDetails,
-    "error"
-  );
-
-  return;
-}
-
-
-
-    const shortUrl =
-      `${window.location.origin}${window.location.pathname}${code}`;
-
-
-    resultLink.href =
-      shortUrl;
-
-    resultLink.textContent =
-      shortUrl;
-
-    result.style.display =
-      "block";
-
-
-    showMessage(
-      "¡Enlace creado correctamente!",
-      "success"
-    );
-
-
-    originalUrl.value = "";
-
-    customCode.value = "";
-
-
-    loadLinks();
-
-  } catch (error) {
-
-    console.error(error);
-
-    showMessage(
-      "Ocurrió un error al crear el enlace.",
-      "error"
-    );
-
-  }
-
-}
-
-
-// ==========================
-// COPIAR
-// ==========================
-
-async function copyResult() {
-
-  try {
-
-    await navigator.clipboard.writeText(
-      resultLink.textContent
-    );
-
-    showMessage(
-      "Enlace copiado.",
-      "success"
-    );
-
-  } catch {
-
-    showMessage(
-      "No se pudo copiar automáticamente.",
-      "error"
-    );
-
-  }
-
-}
-
-
-// ==========================
-// COMPARTIR
-// ==========================
-
-async function shareResult() {
-
-  const url =
-    resultLink.textContent;
-
-
-  if (navigator.share) {
-
-    try {
-
-      await navigator.share({
-        title: "LC ShortLinks",
-        text: "Mira este enlace:",
-        url: url
-      });
-
-    } catch (error) {
-
-      console.log(error);
-
-    }
-
-  } else {
-
-    await copyResult();
-
-  }
-
-}
-
-
-// ==========================
-// CARGAR ENLACES
-// ==========================
-
-async function loadLinks() {
-
-  try {
-
-    const response =
-      await fetch(
-        `${SUPABASE_URL}/rest/v1/Links?select=code,original_url,clicks&order=code.asc`,
-        {
-          headers: {
-            "apikey": SUPABASE_KEY,
-            "Authorization": `Bearer ${SUPABASE_KEY}`
-          }
-        }
-      );
-
-
-    if (!response.ok) {
-
-      throw new Error(
-        "No se pudieron cargar los enlaces."
-      );
-
-    }
-
-
-    const links =
-      await response.json();
-
-
-    counter.textContent =
-      `${links.length} enlace${links.length === 1 ? "" : "s"} creado${links.length === 1 ? "" : "s"}`;
-
-
-    if (links.length === 0) {
-
-      linksList.innerHTML =
-        `<div class="empty">
-          Todavía no tienes enlaces creados.
-        </div>`;
-
-      return;
-    }
-
-
-    linksList.innerHTML = "";
-
-
-    links.forEach(link => {
-
-      const shortUrl =
-        `${window.location.origin}${window.location.pathname}${link.code}`;
-
-
-      const clicks =
-        Number(link.clicks) || 0;
-
-
-      const item =
-        document.createElement("div");
-
-      item.className =
-        "link-item";
-
-
-      item.innerHTML = `
-
-        <div class="link-code">
-          🔗 ${escapeHtml(link.code)}
-        </div>
-
-        <div class="link-original">
-          ${escapeHtml(link.original_url)}
-        </div>
-
-        <div class="link-url">
-          ${escapeHtml(shortUrl)}
-        </div>
-
-        <div class="clicks">
-          📊 ${clicks} clic${clicks === 1 ? "" : "s"}
-        </div>
-
-        <div class="link-buttons">
-
-          <button
-            onclick="openLink('${encodeURIComponent(shortUrl)}')"
-          >
-            Abrir
-          </button>
-
-          <button
-            onclick="copyLink('${encodeURIComponent(shortUrl)}')"
-          >
-            Copiar
-          </button>
-
-          <button
-            class="delete-button"
-            onclick="deleteLink('${encodeURIComponent(link.code)}')"
-          >
-            🗑️ Borrar
-          </button>
-
-        </div>
-
-      `;
-
-
-      linksList.appendChild(item);
-
+    const {error} = await db.from("Links").insert({
+      code,
+      original_url: url,
+      clicks: 0,
+      user_id: currentUser.id
     });
 
+    if (error) throw error;
 
+    const destination = shortUrl(code);
+    $("resultLink").href = destination;
+    $("resultLink").textContent = destination;
+    $("result").classList.remove("hidden");
+    $("originalUrl").value = "";
+    $("customCode").value = "";
+    showMessage("appMessage", "¡Enlace creado correctamente!", "success");
+    await loadLinks();
   } catch (error) {
-
     console.error(error);
-
-    counter.textContent =
-      "No se pudieron cargar los enlaces.";
-
+    showMessage("appMessage", "Error al guardar: " + error.message, "error");
+  } finally {
+    $("createButton").disabled = false;
+    $("createButton").textContent = "Crear enlace LC";
   }
+});
 
-}
-
-
-// ==========================
-// BORRAR
-// ==========================
-
-async function deleteLink(encodedCode) {
-
-  const code =
-    decodeURIComponent(encodedCode);
-
-
-  if (!confirm(
-    `¿Seguro que quieres borrar el enlace "${code}"?`
-  )) {
-
-    return;
-
-  }
-
-
-  try {
-
-    const response =
-      await fetch(
-        `${SUPABASE_URL}/rest/v1/Links?code=eq.${encodeURIComponent(code)}`,
-        {
-          method: "DELETE",
-
-          headers: {
-            "apikey": SUPABASE_KEY,
-            "Authorization": `Bearer ${SUPABASE_KEY}`
-          }
-        }
-      );
-
-
-    if (!response.ok) {
-
-      showMessage(
-        "No se pudo borrar el enlace.",
-        "error"
-      );
-
-      return;
+$("copyResult").addEventListener("click", () => copyText($("resultLink").textContent));
+$("shareResult").addEventListener("click", async () => {
+  const url = $("resultLink").textContent;
+  if (navigator.share) {
+    try {
+      await navigator.share({title:"LC ShortLinks", text:"Mira este enlace:", url});
+    } catch (error) {
+      if (error.name !== "AbortError") console.error(error);
     }
-
-
-    showMessage(
-      `El enlace "${code}" fue borrado correctamente.`,
-      "success"
-    );
-
-
-    loadLinks();
-
-  } catch (error) {
-
-    console.error(error);
-
-    showMessage(
-      "Ocurrió un error al borrar el enlace.",
-      "error"
-    );
-
+  } else {
+    await copyText(url);
   }
+});
 
-}
+async function deleteLink(code) {
+  if (!currentUser || !confirm(`¿Seguro que quieres borrar "${code}"?`)) return;
+  const {error} = await db.from("Links")
+    .delete()
+    .eq("code", code)
+    .eq("user_id", currentUser.id);
 
-
-// ==========================
-// ABRIR
-// ==========================
-
-function openLink(encodedUrl) {
-
-  window.open(
-    decodeURIComponent(encodedUrl),
-    "_blank"
-  );
-
-}
-
-
-// ==========================
-// COPIAR DE LA LISTA
-// ==========================
-
-async function copyLink(encodedUrl) {
-
-  try {
-
-    await navigator.clipboard.writeText(
-      decodeURIComponent(encodedUrl)
-    );
-
-    showMessage(
-      "Enlace copiado.",
-      "success"
-    );
-
-  } catch {
-
-    showMessage(
-      "No se pudo copiar el enlace.",
-      "error"
-    );
-
+  if (error) {
+    showMessage("appMessage", "No se pudo borrar: " + error.message, "error");
+    return;
   }
-
+  showMessage("appMessage", "Enlace borrado correctamente.", "success");
+  await loadLinks();
 }
 
+db.auth.onAuthStateChange((event, session) => {
+  setSignedIn(session ? session.user : null);
+  if (session) {
+    setTimeout(() => loadLinks(), 0);
+  }
+});
 
-// ==========================
-// SEGURIDAD
-// ==========================
-
-function escapeHtml(text) {
-
-  return String(text)
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;")
-    .replace(/"/g, "&quot;")
-    .replace(/'/g, "&#039;");
-
-}
-
-
-// ==========================
-// INICIAR
-// ==========================
-
-loadLinks();
-
+(async function init() {
+  const {data, error} = await db.auth.getSession();
+  if (error) {
+    showMessage("loginMessage", "No se pudo comprobar la sesión: " + error.message, "error");
+    return;
+  }
+  setSignedIn(data.session ? data.session.user : null);
+  if (data.session) await loadLinks();
+})();
 </script>
-
 </body>
 </html>
