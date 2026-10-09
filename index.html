@@ -39,7 +39,7 @@ button:disabled{opacity:.6;cursor:wait}
 #counter{font-size:14px;color:#777;margin-bottom:12px}
 .empty{text-align:center;color:#777;padding:20px 5px}
 .qr-box{margin-top:12px;padding:14px;background:white;border:1px solid #ddd;border-radius:12px;text-align:center}
-.qr-canvas{display:flex;justify-content:center;align-items:center;min-height:200px;margin:8px auto 12px;overflow:hidden}
+.qr-canvas{display:flex;justify-content:center;align-items:center;min-height:240px;margin:8px auto 12px;overflow:hidden}
 .qr-canvas canvas,.qr-canvas img{display:block;width:240px!important;height:240px!important;max-width:100%;object-fit:contain}
 .qr-box p{font-size:13px;color:#555;overflow-wrap:anywhere}
 .qr-box button{width:100%;margin-top:6px}
@@ -117,7 +117,7 @@ button:disabled{opacity:.6;cursor:wait}
 <div id="qrSaveView" class="hidden">
   <h2>Guardar tu código QR</h2>
   <p>Mantén pulsada la imagen y elige <strong>Guardar en Fotos</strong> o <strong>Guardar imagen</strong>, si aparece esa opción.</p>
-  <img id="qrSaveImage" alt="Código QR para guardar">
+  <img id="qrSaveImage" alt="Código QR con logo LC">
   <button id="closeQrSave" class="main-button" type="button">Volver a LC ShortLinks</button>
 </div>
 
@@ -132,8 +132,6 @@ const db = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 const $ = id => document.getElementById(id);
 let currentUser = null;
 let linksCache = [];
-let pendingQrUrl = "";
-let pendingQrFilename = "";
 
 function showMessage(id, text, type) {
   const el = $(id);
@@ -169,26 +167,79 @@ function setSignedIn(user) {
   }
 }
 
+/* Generar QR y colocar el logo LC en el centro. */
 function renderQr(container, value) {
   if (typeof window.QRCode === "undefined") {
     showMessage("appMessage",
-      "No se pudo cargar el generador QR. Revisa tu conexión e inténtalo otra vez.",
+      "No se pudo cargar el generador QR. Revisa tu conexión.",
       "error");
     return false;
   }
 
   container.replaceChildren();
+  container.dataset.logoReady = "false";
 
   try {
     new window.QRCode(container, {
       text: value,
-      width: 240,
-      height: 240,
+      width: 300,
+      height: 300,
       colorDark: "#111111",
       colorLight: "#ffffff",
       correctLevel: window.QRCode.CorrectLevel.H
     });
+
+    const canvas = container.querySelector("canvas");
+
+    if (!canvas) {
+      showMessage("appMessage",
+        "No se pudo preparar la imagen QR.",
+        "error");
+      return false;
+    }
+
+    const ctx = canvas.getContext("2d");
+    const logo = new Image();
+
+    logo.onload = function() {
+      try {
+        const size = canvas.width;
+        const logoSize = size * 0.20;
+        const backingSize = logoSize * 1.35;
+        const x = (size - logoSize) / 2;
+        const y = (size - logoSize) / 2;
+        const bx = (size - backingSize) / 2;
+        const by = (size - backingSize) / 2;
+
+        /* Fondo blanco detrás del logo para mejorar el contraste. */
+        ctx.fillStyle = "#ffffff";
+        ctx.fillRect(bx, by, backingSize, backingSize);
+
+        /* Logo de LC centrado. */
+        ctx.drawImage(logo, x, y, logoSize, logoSize);
+
+        /* Actualiza también la imagen interna de la biblioteca. */
+        const qrImage = container.querySelector("img");
+        if (qrImage) {
+          qrImage.src = canvas.toDataURL("image/png");
+          qrImage.style.display = "none";
+        }
+
+        container.dataset.logoReady = "true";
+      } catch (error) {
+        console.error("Error al colocar el logo:", error);
+        container.dataset.logoReady = "error";
+      }
+    };
+
+    logo.onerror = function() {
+      console.error("No se pudo cargar ./IMG_8655.png");
+      container.dataset.logoReady = "error";
+    };
+
+    logo.src = "./IMG_8655.png";
     return true;
+
   } catch (error) {
     console.error("Error al crear QR:", error);
     showMessage("appMessage", "No se pudo generar el QR.", "error");
@@ -207,39 +258,41 @@ function getQrDataUrl(container) {
       return img.src;
     }
   } catch (error) {
-    console.error("Error al preparar la imagen QR:", error);
+    console.error("Error al preparar imagen QR:", error);
   }
 
   return "";
 }
 
-function showQrSaveView(dataUrl, filename) {
-  if (!dataUrl) {
+function downloadQr(container, filename) {
+  const ready = container.dataset.logoReady;
+
+  if (ready === "false") {
     showMessage("appMessage",
-      "No encontramos la imagen QR. Pulsa Ver QR y vuelve a intentarlo.",
+      "El QR se está preparando. Espera un momento y vuelve a pulsar Guardar QR.",
       "error");
     return;
   }
 
-  pendingQrUrl = dataUrl;
-  pendingQrFilename = filename || "LC-ShortLinks-QR.png";
-  $("qrSaveImage").src = dataUrl;
-  $("qrSaveView").classList.remove("hidden");
-}
-
-function downloadQr(container, filename) {
   const dataUrl = getQrDataUrl(container);
 
   if (!dataUrl) {
     showMessage("appMessage",
-      "Primero pulsa Ver QR y espera a que aparezca la imagen.",
+      "Primero pulsa Ver QR y espera a que aparezca.",
       "error");
     return;
   }
 
-  // En iPhone mostramos una vista con la imagen lista
-  // para guardarla manualmente en Fotos o Archivos.
-  showQrSaveView(dataUrl, filename);
+  /* En caso de que el logo no cargue, el QR sigue disponible. */
+  if (ready === "error") {
+    showMessage("appMessage",
+      "El QR se guardará sin logo porque no se pudo cargar la imagen LC.",
+      "error");
+  }
+
+  $("qrSaveImage").src = dataUrl;
+  $("qrSaveImage").alt = filename || "Código QR LC";
+  $("qrSaveView").classList.remove("hidden");
 }
 
 $("closeQrSave").addEventListener("click", () => {
@@ -326,10 +379,11 @@ async function loadLinks() {
 
         setTimeout(() => {
           qrBox.scrollIntoView({
-            behavior: "smooth",
-            block: "nearest"
+            behavior:"smooth",
+            block:"nearest"
           });
         }, 100);
+
       } else {
         qrBox.classList.add("hidden");
         qrButton.textContent = "▦ Ver QR";
@@ -366,6 +420,7 @@ async function copyText(value) {
     }
 
     showMessage("appMessage", "¡Enlace copiado!", "success");
+
   } catch (error) {
     showMessage("appMessage",
       "No se pudo copiar automáticamente. Mantén pulsado el enlace para copiarlo.",
@@ -390,9 +445,11 @@ $("loginForm").addEventListener("submit", async event => {
     setSignedIn(data.user);
     $("password").value = "";
     await loadLinks();
+
   } catch (error) {
     showMessage("loginMessage",
-      "No se pudo iniciar sesión: " + error.message, "error");
+      "No se pudo iniciar sesión: " + error.message,
+      "error");
   } finally {
     $("loginButton").disabled = false;
     $("loginButton").textContent = "Entrar";
@@ -404,7 +461,8 @@ $("logoutButton").addEventListener("click", async () => {
 
   if (error) {
     showMessage("appMessage",
-      "No se pudo cerrar sesión: " + error.message, "error");
+      "No se pudo cerrar sesión: " + error.message,
+      "error");
   } else {
     setSignedIn(null);
     clearMessage("loginMessage");
@@ -417,6 +475,7 @@ $("createForm").addEventListener("submit", async event => {
   $("result").classList.add("hidden");
   $("resultQrBox").classList.add("hidden");
   $("resultQr").replaceChildren();
+  $("resultQr").dataset.logoReady = "";
 
   if (!currentUser) {
     showMessage("appMessage", "Inicia sesión primero.", "error");
@@ -483,10 +542,10 @@ $("createForm").addEventListener("submit", async event => {
 
     showMessage("appMessage", "¡Enlace creado correctamente!", "success");
     await loadLinks();
+
   } catch (error) {
     console.error(error);
-    showMessage("appMessage",
-      "Error al guardar: " + error.message, "error");
+    showMessage("appMessage", "Error al guardar: " + error.message, "error");
   } finally {
     $("createButton").disabled = false;
     $("createButton").textContent = "Crear enlace LC";
@@ -531,6 +590,7 @@ $("showResultQr").addEventListener("click", () => {
 
     $("showResultQr").textContent = "Ocultar QR";
     box.scrollIntoView({behavior:"smooth", block:"nearest"});
+
   } else {
     box.classList.add("hidden");
     $("showResultQr").textContent = "▦ Ver QR";
@@ -550,8 +610,7 @@ async function deleteLink(code) {
     .eq("user_id", currentUser.id);
 
   if (error) {
-    showMessage("appMessage",
-      "No se pudo borrar: " + error.message, "error");
+    showMessage("appMessage", "No se pudo borrar: " + error.message, "error");
     return;
   }
 
@@ -572,7 +631,8 @@ db.auth.onAuthStateChange((event, session) => {
 
   if (error) {
     showMessage("loginMessage",
-      "No se pudo comprobar la sesión: " + error.message, "error");
+      "No se pudo comprobar la sesión: " + error.message,
+      "error");
     return;
   }
 
