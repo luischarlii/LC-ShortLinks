@@ -855,7 +855,7 @@ linksList.addEventListener("click", async function(event) {
       try {
         await navigator.share({
           title: "Mi enlace LC ShortLinks",
-          url: shortUrl
+          url: originalUrl
         });
       } catch (error) {
         if (error.name !== "AbortError") {
