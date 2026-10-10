@@ -683,7 +683,7 @@ document.getElementById("createForm").addEventListener(
        */
       const { error } = await db.from("Links").insert({
         code: slug,
-      
+  
         original_url: originalUrl,
         clicks: 0,
         user_id: currentUser.id
@@ -780,14 +780,17 @@ function renderLinks(links) {
 
     return `
       <div class="link-item">
-        <strong>${escapeHTML(displayName)}</strong>
 
-        <a class="short-link"
-           href="${escapeHTML(shortUrl)}"
-           target="_blank"
-           rel="noopener noreferrer">
-          ${escapeHTML(shortUrl)}
-        </a>
+<a class="short-link"
+   href="${escapeHTML(originalUrl)}"
+   target="_blank"
+   rel="noopener noreferrer">
+  ${escapeHTML(displayName)} ↗
+</a>
+
+<span class="original-link">
+  Destino: ${escapeHTML(originalUrl)}
+</span>
 
         <span class="original-link">
           Destino: ${escapeHTML(originalUrl)}
