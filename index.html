@@ -683,7 +683,7 @@ document.getElementById("createForm").addEventListener(
        */
       const { error } = await db.from("Links").insert({
         code: slug,
-        codetext: slug,
+      
         original_url: originalUrl,
         clicks: 0,
         user_id: currentUser.id
