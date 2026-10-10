@@ -877,8 +877,16 @@ linksList.addEventListener("click", async function(event) {
   }
 
   if (action === "qr") {
-    openQR(shortUrl);
+  const link = button.closest(".link-item");
+  const destination = link.querySelector(".original-link")
+    ?.textContent.replace("Destino:", "").trim();
+
+  if (destination && validDestination(destination)) {
+    openQR(destination);
+  } else {
+    alert("No se pudo identificar la URL de destino.");
   }
+}
 
   if (action === "delete") {
     const confirmed = confirm(
