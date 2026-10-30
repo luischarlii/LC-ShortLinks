@@ -1,0 +1,21 @@
+{
+  "id": "./",
+  "name": "LC SHORT LINKS",
+  "short_name": "LC SHORT LINKS",
+  "description": "Generador de enlaces cortos.",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#111827",
+  "theme_color": "#111827",
+  "icons": [
+    {
+      "src": "./",
+      "sizes": "180x180",
+      "type": "image/png",
+      "purpose": "any"
+    }
+  ]
+}
+
