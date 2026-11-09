@@ -467,6 +467,25 @@
  
     </form>
 
+    <div id="codeBox" class="hidden" style="margin-top:14px;">
+      <p class="hint">
+        Te enviamos un correo. Escribe aquí el <strong>código de 6 dígitos</strong>
+        que trae y tu nueva contraseña.
+      </p>
+
+      <label for="recoveryCode">Código del correo</label>
+      <input id="recoveryCode" type="text" inputmode="numeric"
+        autocomplete="one-time-code" maxlength="10" placeholder="123456">
+
+      <label for="codeNewPassword">Nueva contraseña</label>
+      <input id="codeNewPassword" type="password" minlength="6"
+        autocomplete="new-password" placeholder="Mínimo 6 caracteres">
+
+      <button class="main-button" id="codeResetButton" type="button">
+        Cambiar contraseña con código
+      </button>
+    </div>
+
     <button class="secondary" id="registerButton">
       Crear cuenta nueva
     </button>
@@ -523,6 +542,28 @@
       <button class="secondary" id="logoutButton">
         Cerrar sesión
       </button>
+    </div>
+
+    <div class="card">
+      <h2>Cambiar mi contraseña</h2>
+
+      <form id="changePasswordForm">
+        <label for="changePass1">Nueva contraseña</label>
+        <input id="changePass1" type="password" minlength="6"
+          autocomplete="new-password" placeholder="Mínimo 6 caracteres"
+          required>
+
+        <label for="changePass2">Confirmar contraseña</label>
+        <input id="changePass2" type="password" minlength="6"
+          autocomplete="new-password" placeholder="Repite la contraseña"
+          required>
+
+        <button class="main-button" type="submit">
+          Guardar contraseña
+        </button>
+      </form>
+
+      <p id="changePassMessage" class="message" aria-live="polite"></p>
     </div>
 
     <div class="card">
@@ -696,8 +737,73 @@ document.getElementById("forgotPasswordButton").addEventListener(
       authMessage,
       "Si la cuenta existe, recibirás un correo con las instrucciones para recuperar tu contraseña. Revisa también el correo no deseado."
     );
+    document.getElementById("codeBox").classList.remove("hidden");
   }
 );
+/* CAMBIAR CONTRASEÑA CON CÓDIGO DEL CORREO (no depende del enlace) */
+document.getElementById("codeResetButton").addEventListener(
+  "click", async function() {
+    const email = document.getElementById("email").value.trim();
+    const token = document.getElementById("recoveryCode").value.trim();
+    const password = document.getElementById("codeNewPassword").value;
+
+    if (!email || !token || !password) {
+      showMessage(
+        authMessage,
+        "Escribe tu correo, el código y la nueva contraseña.",
+        true
+      );
+      return;
+    }
+
+    if (password.length < 6) {
+      showMessage(
+        authMessage,
+        "La contraseña debe tener al menos 6 caracteres.",
+        true
+      );
+      return;
+    }
+
+    const button = document.getElementById("codeResetButton");
+    button.disabled = true;
+    showMessage(authMessage, "Verificando código...");
+
+    const verify = await db.auth.verifyOtp({
+      email: email,
+      token: token,
+      type: "recovery"
+    });
+
+    if (verify.error) {
+      button.disabled = false;
+      showMessage(
+        authMessage,
+        "Código inválido o vencido: " + verify.error.message,
+        true
+      );
+      return;
+    }
+
+    const update = await db.auth.updateUser({ password: password });
+    button.disabled = false;
+
+    if (update.error) {
+      showMessage(
+        authMessage,
+        "No se pudo cambiar la contraseña: " + update.error.message,
+        true
+      );
+      return;
+    }
+
+    document.getElementById("recoveryCode").value = "";
+    document.getElementById("codeNewPassword").value = "";
+    document.getElementById("codeBox").classList.add("hidden");
+    showMessage(authMessage, "¡Contraseña actualizada correctamente!");
+  }
+);
+
 /* GUARDAR NUEVA CONTRASEÑA */
 document.getElementById("resetPasswordForm").addEventListener(
   "submit", async function(event) {
@@ -827,6 +933,52 @@ document.getElementById("loginForm").addEventListener(
     if (error) {
       showMessage(authMessage, error.message, true);
     }
+  }
+);
+
+/* CAMBIAR CONTRASEÑA ESTANDO DENTRO DE LA CUENTA */
+document.getElementById("changePasswordForm").addEventListener(
+  "submit", async function(event) {
+    event.preventDefault();
+
+    const message = document.getElementById("changePassMessage");
+    const p1 = document.getElementById("changePass1").value;
+    const p2 = document.getElementById("changePass2").value;
+
+    if (!currentUser) {
+      showMessage(message, "Inicia sesión primero.", true);
+      return;
+    }
+
+    if (p1.length < 6) {
+      showMessage(
+        message,
+        "La contraseña debe tener al menos 6 caracteres.",
+        true
+      );
+      return;
+    }
+
+    if (p1 !== p2) {
+      showMessage(message, "Las contraseñas no coinciden.", true);
+      return;
+    }
+
+    showMessage(message, "Guardando...");
+
+    const { error } = await db.auth.updateUser({ password: p1 });
+
+    if (error) {
+      showMessage(
+        message,
+        "No se pudo cambiar la contraseña: " + error.message,
+        true
+      );
+      return;
+    }
+
+    document.getElementById("changePasswordForm").reset();
+    showMessage(message, "¡Contraseña actualizada correctamente!");
   }
 );
 
