@@ -6,6 +6,28 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#111111">
   <title>LC ShortLinks</title>
+  <script>
+  /* Capturar el enlace de recuperación ANTES de que Supabase limpie la URL */
+  (function () {
+    try {
+      var h = new URLSearchParams(window.location.hash.replace(/^#/, ""));
+      var q = new URLSearchParams(window.location.search);
+      var href = window.location.href;
+      if (h.get("type") === "recovery" || q.get("type") === "recovery" ||
+          /type=recovery/.test(href)) {
+        sessionStorage.setItem("lc_recovery", "1");
+      }
+      var err = h.get("error_description") || q.get("error_description");
+      if (err) {
+        sessionStorage.setItem("lc_link_error", JSON.stringify({
+          code: h.get("error_code") || q.get("error_code") || "",
+          text: err
+        }));
+      }
+    } catch (e) {}
+  })();
+  </script>
+
 
   <style>
     * { box-sizing: border-box; }
@@ -210,148 +232,14 @@
     <p>Enlaces cortos con tu propio nombre</p>
   </header>
 
-  <section id="authSection" class="card">
-    <h2>Accede a tu cuenta</h2>
-
-    <form id="loginForm">
-      <label for="email">Correo electrónico</label>
-      <input
-        id="email"
-        type="email"
-        placeholder="tucorreo@ejemplo.com"
-        autocomplete="email"
-        required
-      >
-
-      <label for="password">Contraseña</label>
-      <input
-        id="password"
-        type="password"
-        placeholder="Tu contraseña"
-        autocomplete="current-password"
-        required
-      >
-
-      <button class="main-button" type="submit">
-        Iniciar sesión
-      </button>
-  
-<button class="secondary" id="forgotPasswordButton" type="button">
-  ¿Olvidaste tu contraseña?
-</button>
- 
-    </form>
-
-    <button class="secondary" id="registerButton">
-      Crear cuenta nueva
-    </button>
-
-    <p id="authMessage" class="message" aria-live="polite"></p>
-  </section>
-
-  <section id="appSection">
-<section id="resetSection" class="card hidden">
-  <h2>Crear nueva contraseña</h2>
-  <p>Escribe y confirma tu nueva contraseña.</p>
-
-  <form id="resetPasswordForm">
-    <label for="newPassword">Nueva contraseña</label>
-    <input
-      id="newPassword"
-      type="password"
-      minlength="6"
-      autocomplete="new-password"
-      placeholder="Mínimo 6 caracteres"
-      required
-    >
-
-    <label for="confirmPassword">Confirmar contraseña</label>
-    <input
-      id="confirmPassword"
-      type="password"
-      minlength="6"
-      autocomplete="new-password"
-      placeholder="Repite la contraseña"
-      required
-    >
-
-    <button class="main-button" type="submit">
-      Guardar nueva contraseña
-    </button>
-  </form>
-
-  <p id="resetMessage" class="message" aria-live="polite"></p>
-</section>
-    <div class="card">
-      <p id="userInfo" class="hint"></p>
-
-      <div class="counter">
-        Enlaces guardados: <span id="counter">0</span>
-      </div>
-
-      <button class="secondary" id="refreshButton">
-        Actualizar lista
-      </button>
-
-      <button class="secondary" id="logoutButton">
-        Cerrar sesión
-      </button>
-    </div>
-
-    <div class="card">
-      <h2>Crear enlace corto</h2>
-
-      <form id="createForm">
-        <label for="originalUrl">Enlace original</label>
-        <input
-          id="originalUrl"
-          type="url"
-          placeholder="https://ejemplo.com/pagina"
-          required
-        >
-
-        <label for="tunombre">Nombre personalizado</label>
-        <input
-          id="tunombre"
-          type="text"
-          placeholder="mi-oferta"
-          maxlength="50"
-          pattern="[A-Za-z0-9_-]+"
-          title="Usa letras sin acentos, números, guiones o guiones bajos"
-          autocomplete="off"
-          required
-        >
-
-        <p class="hint">
-          Este nombre aparecerá al final de tu enlace corto.
-          No uses espacios ni acentos.
-        </p>
-
-        <button class="main-button" id="createButton" type="submit">
-          Crear enlace corto
-        </button>
-      </form>
-
-      <p id="createMessage" class="message" aria-live="polite"></p>
-    </div>
-
-    <div class="card">
-      <h2>Mis enlaces</h2>
-
-      <div id="linksList">
-        <p class="hint">Cargando enlaces...</p>
-      </div>
-    </div>
-
-  </section>
-
+<!-- ===== 2. Apoyo Mercado Pago ===== -->
 <!-- Botón Apoyo con Mercado Pago en la cabecera -->
 <div class="lc-support">
   <button id="lcDonateBtn" class="lc-support-trigger"
           aria-expanded="false">
     <span class="lc-heart">♡</span>
     <span class="lc-support-text">
-      <strong>Te Gustaria Apoyar LC Radio Universal</strong>
+      <strong>Te Gustaria Apoyar LC ShortLinks</strong>
       <small>Donaciones voluntarias</small>
     </span>
     <span id="lcArrow">⌄</span>
@@ -367,7 +255,8 @@
     </div>
 
     <p><strong>Beneficiario:</strong><br>
-      LC Radio Universal</p>
+      LC ShortLinks</p>
+    <!-- "LC ShortLinks" aquí debe quedar igual que en el botón de arriba -->
 
     <p><strong>CLABE interbancaria:</strong></p>
 
@@ -544,6 +433,146 @@
 })();
 </script>
 <!-- Botón Apoyo mercado Final -->
+<!-- ===== fin Apoyo Mercado Pago ===== -->
+
+  <section id="authSection" class="card">
+    <h2>Accede a tu cuenta</h2>
+
+    <form id="loginForm">
+      <label for="email">Correo electrónico</label>
+      <input
+        id="email"
+        type="email"
+        placeholder="tucorreo@ejemplo.com"
+        autocomplete="email"
+        required
+      >
+
+      <label for="password">Contraseña</label>
+      <input
+        id="password"
+        type="password"
+        placeholder="Tu contraseña"
+        autocomplete="current-password"
+        required
+      >
+
+      <button class="main-button" type="submit">
+        Iniciar sesión
+      </button>
+  
+<button class="secondary" id="forgotPasswordButton" type="button">
+  ¿Olvidaste tu contraseña?
+</button>
+ 
+    </form>
+
+    <button class="secondary" id="registerButton">
+      Crear cuenta nueva
+    </button>
+
+    <p id="authMessage" class="message" aria-live="polite"></p>
+  </section>
+
+  <section id="resetSection" class="card hidden">
+  <h2>Crear nueva contraseña</h2>
+  <p>Escribe y confirma tu nueva contraseña.</p>
+
+  <form id="resetPasswordForm">
+    <label for="newPassword">Nueva contraseña</label>
+    <input
+      id="newPassword"
+      type="password"
+      minlength="6"
+      autocomplete="new-password"
+      placeholder="Mínimo 6 caracteres"
+      required
+    >
+
+    <label for="confirmPassword">Confirmar contraseña</label>
+    <input
+      id="confirmPassword"
+      type="password"
+      minlength="6"
+      autocomplete="new-password"
+      placeholder="Repite la contraseña"
+      required
+    >
+
+    <button class="main-button" type="submit">
+      Guardar nueva contraseña
+    </button>
+  </form>
+
+  <p id="resetMessage" class="message" aria-live="polite"></p>
+</section>
+
+  <section id="appSection">
+
+    <div class="card">
+      <p id="userInfo" class="hint"></p>
+
+      <div class="counter">
+        Enlaces guardados: <span id="counter">0</span>
+      </div>
+
+      <button class="secondary" id="refreshButton">
+        Actualizar lista
+      </button>
+
+      <button class="secondary" id="logoutButton">
+        Cerrar sesión
+      </button>
+    </div>
+
+    <div class="card">
+      <h2>Crear enlace corto</h2>
+
+      <form id="createForm">
+        <label for="originalUrl">Enlace original</label>
+        <input
+          id="originalUrl"
+          type="url"
+          placeholder="https://ejemplo.com/pagina"
+          required
+        >
+
+        <label for="tunombre">Nombre personalizado</label>
+        <input
+          id="tunombre"
+          type="text"
+          placeholder="mi-oferta"
+          maxlength="50"
+          pattern="[A-Za-z0-9_-]+"
+          title="Usa letras sin acentos, números, guiones o guiones bajos"
+          autocomplete="off"
+          required
+        >
+
+        <p class="hint">
+          Este nombre aparecerá al final de tu enlace corto.
+          No uses espacios ni acentos.
+        </p>
+
+        <button class="main-button" id="createButton" type="submit">
+          Crear enlace corto
+        </button>
+      </form>
+
+      <p id="createMessage" class="message" aria-live="polite"></p>
+    </div>
+
+    <div class="card">
+      <h2>Mis enlaces</h2>
+
+      <div id="linksList">
+        <p class="hint">Cargando enlaces...</p>
+      </div>
+    </div>
+
+  </section>
+
+
   
 </div>
   <footer>LC ShortLinks · Luis Charlii</footer>
@@ -714,6 +743,9 @@ document.getElementById("resetPasswordForm").addEventListener(
 
     showMessage(message, "¡Contraseña actualizada correctamente!");
 
+    endRecoveryMode();
+    history.replaceState(null, "", window.location.pathname);
+
     document.getElementById("resetPasswordForm").reset();
     document.getElementById("resetSection").classList.add("hidden");
 
@@ -809,16 +841,59 @@ document.getElementById("logoutButton").addEventListener(
   }
 );
 
+/* RECUPERACIÓN DE CONTRASEÑA: DETECTAR EL ENLACE DEL CORREO */
+let recoveryMode = false;
+let storedError = null;
+
+try {
+  recoveryMode = sessionStorage.getItem("lc_recovery") === "1";
+  storedError = JSON.parse(sessionStorage.getItem("lc_link_error") || "null");
+  sessionStorage.removeItem("lc_link_error");
+} catch (e) {}
+
+function showRecoveryForm() {
+  recoveryMode = true;
+  try { sessionStorage.setItem("lc_recovery", "1"); } catch (e) {}
+  authSection.style.display = "none";
+  appSection.style.display = "none";
+  document.getElementById("resetSection")
+    .classList.remove("hidden");
+}
+
+function endRecoveryMode() {
+  recoveryMode = false;
+  try { sessionStorage.removeItem("lc_recovery"); } catch (e) {}
+}
+
+/* Si el enlace llegó con error (expirado o ya usado) */
+if (storedError) {
+  endRecoveryMode();
+  showMessage(
+    authMessage,
+    storedError.code === "otp_expired"
+      ? "El enlace ya expiró o ya fue usado. Pide uno nuevo con \"¿Olvidaste tu contraseña?\" y ábrelo de inmediato."
+      : "No se pudo usar el enlace: " + storedError.text.replace(/\+/g, " "),
+    true
+  );
+} else if (recoveryMode) {
+  showRecoveryForm();
+}
+
 /* ESTADO DE SESIÓN */
 db.auth.onAuthStateChange(function(event, session) {
   currentUser = session ? session.user : null;
+
   if (event === "PASSWORD_RECOVERY") {
-    authSection.style.display = "none";
-    appSection.style.display = "none";
-    document.getElementById("resetSection")
-      .classList.remove("hidden");
+    showRecoveryForm();
     return;
   }
+
+  /* Mientras se cambia la contraseña, no mostrar la app */
+  if (recoveryMode && currentUser) {
+    showRecoveryForm();
+    return;
+  }
+
   if (currentUser) {
     authSection.style.display = "none";
     appSection.style.display = "block";
@@ -830,7 +905,7 @@ db.auth.onAuthStateChange(function(event, session) {
       loadLinks();
     }
   } else {
-    authSection.style.display = "block";
+    authSection.style.display = recoveryMode ? "none" : "block";
     appSection.style.display = "none";
     linksList.replaceChildren();
     counter.textContent = "0";
@@ -1236,5 +1311,35 @@ document.getElementById("downloadQRButton").addEventListener(
   }
 );
 </script>
+<!-- ===== 1. LC-Ads ===== -->
+<script
+  src="https://luischarlii.github.io/LC-Ads/lc-ads.js?v=2"
+  data-app="all">
+</script>
+<!-- ===== fin LC-Ads ===== -->
+
+<!-- ===== 3. Contador de usuarios ===== -->
+<script>
+(function () {
+  var APP = "shortlinks";
+  var ENDPOINT = "https://contador.paragugliar.workers.dev/ping";
+  try {
+    var id = localStorage.getItem("uid");
+    if (!id) {
+      id = crypto.randomUUID ? crypto.randomUUID() : Date.now() + "-" + Math.random().toString(36).slice(2);
+      localStorage.setItem("uid", id);
+    }
+    var hoy = new Date().toDateString();
+    if (localStorage.getItem("ping_" + APP) === hoy) return; // ya se reportó hoy
+    fetch(ENDPOINT, {
+      method: "POST",
+      headers: { "Content-Type": "text/plain" },
+      body: JSON.stringify({ app: APP, id: id }),
+      keepalive: true,
+    }).then(function () { localStorage.setItem("ping_" + APP, hoy); }).catch(function () {});
+  } catch (e) {}
+})();
+</script>
+<!-- ===== fin Contador de usuarios ===== -->
+
 </body>
-</html>
